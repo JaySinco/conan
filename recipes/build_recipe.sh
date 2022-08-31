@@ -7,8 +7,14 @@ case "$(uname -m)" in
 esac
 
 case "$OSTYPE" in
-    linux*)   PLATFORM=linux ;;
-    msys*)    PLATFORM=windows ;;
+    linux*)
+        PLATFORM=linux
+        GENERATOR=Ninja
+        ;;
+    msys*)
+        PLATFORM=windows
+        GENERATOR=Ninja
+        ;;
 esac
 
 echo "arch: $ARCH"
@@ -19,4 +25,5 @@ PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
 conan create \
     --profile:build="$PROJECT_ROOT/profiles/$ARCH-$PLATFORM.profile" \
+    --conf="tools.cmake.cmaketoolchain:generator=$GENERATOR" \
     . jaysinco/stable

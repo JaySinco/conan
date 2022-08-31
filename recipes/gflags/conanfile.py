@@ -22,7 +22,7 @@ class GflagsConan(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": True,
-        "nothreads": True,
+        "nothreads": False,
         "namespace": "gflags",
     }
 
@@ -34,8 +34,8 @@ class GflagsConan(ConanFile):
         if self.options.shared:
             del self.options.fPIC
 
-    # def layout(self):
-    #     cmake_layout(self, src_folder="src")
+    def layout(self):
+        cmake_layout(self, src_folder="src")
 
     def source(self):
         srcFile = os.path.join(
@@ -45,7 +45,7 @@ class GflagsConan(ConanFile):
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
 
     def generate(self):
-        tc = CMakeToolchain(self, generator="Ninja")
+        tc = CMakeToolchain(self)
         tc.variables["BUILD_gflags_LIB"] = not self.options.nothreads
         tc.variables["BUILD_gflags_nothreads_LIB"] = self.options.nothreads
         tc.variables["BUILD_PACKAGING"] = False
