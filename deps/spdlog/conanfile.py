@@ -1,5 +1,5 @@
 from conans import ConanFile, tools
-from conan.tools.cmake import CMakeToolchain, CMake
+from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
 from conan.tools.files import collect_libs, copy, rmdir
 import os
 
@@ -16,14 +16,12 @@ class SpdlogConan(ConanFile):
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
-        "nothreads": [True, False],
-        "namespace": ["ANY"]
+        "no_exceptions": [True, False],
     }
     default_options = {
         "shared": False,
         "fPIC": True,
-        "nothreads": False,
-        "namespace": "gflags",
+        "no_exceptions": False,
     }
 
     def config_options(self):
@@ -53,19 +51,21 @@ class SpdlogConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
-        tc.variables["BUILD_STATIC_LIBS"] = not self.options.shared
-        tc.variables["BUILD_gflags_LIB"] = not self.options.nothreads
-        tc.variables["BUILD_gflags_nothreads_LIB"] = self.options.nothreads
-        tc.variables["BUILD_PACKAGING"] = False
-        tc.variables["BUILD_TESTING"] = False
-        tc.variables["INSTALL_HEADERS"] = True
-        tc.variables["INSTALL_SHARED_LIBS"] = self.options.shared
-        tc.variables["INSTALL_STATIC_LIBS"] = not self.options.shared
-        tc.variables["REGISTER_BUILD_DIR"] = False
-        tc.variables["REGISTER_INSTALL_PREFIX"] = False
-        tc.variables["GFLAGS_NAMESPACE"] = self.options.namespace
+        tc.variables["SPDLOG_BUILD_EXAMPLE"] = False
+        tc.variables["SPDLOG_BUILD_EXAMPLE_HO"] = False
+        tc.variables["SPDLOG_BUILD_TESTS"] = False
+        tc.variables["SPDLOG_BUILD_TESTS_HO"] = False
+        tc.variables["SPDLOG_BUILD_BENCH"] = False
+        tc.variables["SPDLOG_FMT_EXTERNAL"] = True
+        tc.variables["SPDLOG_FMT_EXTERNAL_HO"] = False
+        tc.variables["SPDLOG_BUILD_SHARED"] = self.options.shared
+        tc.variables["SPDLOG_WCHAR_SUPPORT"] = False
+        tc.variables["SPDLOG_WCHAR_FILENAMES"] = False
+        tc.variables["SPDLOG_INSTALL"] = True
+        tc.variables["SPDLOG_NO_EXCEPTIONS"] = self.options.no_exceptions
         tc.generate()
+        cmake_deps = CMakeDeps(self)
+        cmake_deps.generate()
 
     def build(self):
         cmake = CMake(self)
@@ -73,7 +73,7 @@ class SpdlogConan(ConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, "COPYING.txt", dst=os.path.join(
+        copy(self, "LICENSE", dst=os.path.join(
             self.package_folder, "licenses"), src=self.source_folder)
         cmake = CMake(self)
         cmake.install()
@@ -81,8 +81,12 @@ class SpdlogConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
+        self.cpp_info.set_property("cmake_file_name", "spdlog")
+        self.cpp_info.set_property("cmake_target_name", "spdlog::spdlog")
+        self.cpp_info.set_property("pkg_config_name", "spdlog")
         self.cpp_info.libs = collect_libs(self, folder="lib")
-        if self.settings.os == "Windows":
-            self.cpp_info.system_libs.extend(["shlwapi"])
-        elif self.settings.os in ["Linux", "FreeBSD"]:
-            self.cpp_info.system_libs.extend(["pthread", "m"])
+        self.cpp_info.defines.append("SPDLOG_COMPILED_LIB")
+        if self.options.no_exceptions:
+            self.cpp_info.defines.append("SPDLOG_NO_EXCEPTIONS")
+        if self.settings.os in ["Linux", "FreeBSD"]:
+            self.cpp_info.system_libs.extend(["pthread"])

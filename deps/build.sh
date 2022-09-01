@@ -26,6 +26,7 @@ function conan_install() {
         --profile=$CONAN_PROFILE \
         --profile:build=$CONAN_PROFILE \
         --conf=$CONAN_CONF \
+        --build=never \
         . $CONAN_REF
 }
 
