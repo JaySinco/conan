@@ -1,5 +1,5 @@
 from conans import ConanFile, tools
-from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout
+from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
 import os
 
@@ -7,8 +7,8 @@ import os
 class GflagsConan(ConanFile):
     name = "gflags"
     version = "2.2.2"
-    homepage = "https://github.com/gflags/gflags"
     url = "https://github.com/JaySinco/conan"
+    homepage = "https://github.com/gflags/gflags"
     description = "The gflags package contains a C++ library that implements commandline flags processing"
     license = "BSD-3-Clause"
 
@@ -78,10 +78,7 @@ class GflagsConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "gflags")
-        self.cpp_info.set_property("cmake_target_name", "gflags::gflags")
-        self.cpp_info.set_property("pkg_config_name", "gflags")
-        self.cpp_info.libs = collect_libs(self)
+        self.cpp_info.libs = collect_libs(self, folder="lib")
         if self.settings.os == "Windows":
             self.cpp_info.system_libs.extend(["shlwapi"])
         elif self.settings.os in ["Linux", "FreeBSD"]:

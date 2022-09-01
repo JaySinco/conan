@@ -7,14 +7,8 @@ case "$(uname -m)" in
 esac
 
 case "$OSTYPE" in
-    linux*)
-        PLATFORM=linux
-        GENERATOR=Ninja
-        ;;
-    msys*)
-        PLATFORM=win32
-        GENERATOR=Ninja
-        ;;
+    linux*)   PLATFORM=linux ;;
+    msys*)    PLATFORM=win32 ;;
 esac
 
 echo "arch: $ARCH"
@@ -25,7 +19,7 @@ PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
 CONAN_REF="jaysinco/stable"
 CONAN_PROFILE="$PROJECT_ROOT/config/$PLATFORM/$ARCH/conan.profile"
-CONAN_CONF="tools.cmake.cmaketoolchain:generator=$GENERATOR"
+CONAN_CONF="tools.cmake.cmaketoolchain:generator=Ninja"
 
 function conan_install() {
     conan install \
