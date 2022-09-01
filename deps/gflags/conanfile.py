@@ -39,17 +39,23 @@ class GflagsConan(ConanFile):
 
     def source(self):
         srcFile = os.path.join(
-            os.path.abspath(tools.get_env("JAYSINCO_SOURCE_REPO")),
-            "%s-%s.tar.gz" % (self.name, self.version))
+            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
 
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
 
     def generate(self):
         tc = CMakeToolchain(self)
+        tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
+        tc.variables["BUILD_STATIC_LIBS"] = not self.options.shared
         tc.variables["BUILD_gflags_LIB"] = not self.options.nothreads
         tc.variables["BUILD_gflags_nothreads_LIB"] = self.options.nothreads
         tc.variables["BUILD_PACKAGING"] = False
         tc.variables["BUILD_TESTING"] = False
+        tc.variables["INSTALL_HEADERS"] = True
+        tc.variables["INSTALL_SHARED_LIBS"] = self.options.shared
+        tc.variables["INSTALL_STATIC_LIBS"] = not self.options.shared
+        tc.variables["REGISTER_BUILD_DIR"] = False
+        tc.variables["REGISTER_INSTALL_PREFIX"] = False
         tc.variables["GFLAGS_NAMESPACE"] = self.options.namespace
         tc.generate()
 

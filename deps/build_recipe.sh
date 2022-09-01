@@ -12,7 +12,7 @@ case "$OSTYPE" in
         GENERATOR=Ninja
         ;;
     msys*)
-        PLATFORM=windows
+        PLATFORM=win32
         GENERATOR=Ninja
         ;;
 esac
@@ -24,6 +24,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
 conan create \
-    --profile:build="$PROJECT_ROOT/profiles/$ARCH-$PLATFORM.profile" \
+    --profile:build="$PROJECT_ROOT/config/$PLATFORM/$ARCH/conan.profile" \
     --conf="tools.cmake.cmaketoolchain:generator=$GENERATOR" \
     . jaysinco/stable
