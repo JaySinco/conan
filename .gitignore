@@ -1,4 +1,4 @@
-/deps/*/build
+/deps/*/out
 /deps/*/src
 /deps/*/conan.lock
 /deps/*/conanbuildinfo.txt

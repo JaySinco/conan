@@ -35,7 +35,12 @@ class GflagsConan(ConanFile):
             del self.options.fPIC
 
     def layout(self):
-        cmake_layout(self, src_folder="src")
+        build_folder = "out"
+        build_type = str(self.settings.build_type)
+
+        self.folders.source = "src"
+        self.folders.build = os.path.join(build_folder, build_type)
+        self.folders.generators = build_folder
 
     def source(self):
         srcFile = os.path.join(

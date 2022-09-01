@@ -14,6 +14,7 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  -m, --mount     mount vbox share"
             echo "  -u, --umount    unmount vbox share"
+            echo "  -c, --clean     clean all build output"
             echo "  -h, --help      print command line options"
             echo
             exit 0
@@ -26,6 +27,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -u|--umount)
             sudo umount -a -t vboxsf
+            exit 0
+            ;;
+        -c|--clean)
+            git clean -fdx
             exit 0
             ;;
         -*|--*)
