@@ -21,6 +21,14 @@ CONAN_REF="jaysinco/stable"
 CONAN_PROFILE="$PROJECT_ROOT/config/$PLATFORM/$ARCH/conan.profile"
 CONAN_CONF="tools.cmake.cmaketoolchain:generator=Ninja"
 
+if [ $PLATFORM = "linux" ]; then
+    SOURCE_REPO="$PROJECT_ROOT/src"
+elif [ $PLATFORM = "win32" ]; then
+    SOURCE_REPO="$HOME/OneDrive/src"
+fi
+
+export JAYSINCO_SOURCE_REPO=$SOURCE_REPO
+
 function conan_install() {
     conan install \
         --profile=$CONAN_PROFILE \
