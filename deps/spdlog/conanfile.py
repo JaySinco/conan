@@ -41,7 +41,7 @@ class SpdlogConan(ConanFile):
 
         self.folders.source = "src"
         self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = build_folder
+        self.folders.generators = os.path.join(build_folder, "generators")
 
     def source(self):
         srcFile = os.path.join(
@@ -83,6 +83,8 @@ class SpdlogConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "spdlog")
         self.cpp_info.set_property("cmake_target_name", "spdlog::spdlog")
+        self.cpp_info.set_property("pkg_config_name", "spdlog")
+        self.cpp_info.requires = ["fmt::fmt"]
         self.cpp_info.libs = collect_libs(self, folder="lib")
         self.cpp_info.defines.append("SPDLOG_COMPILED_LIB")
         self.cpp_info.defines.append("SPDLOG_FMT_EXTERNAL")

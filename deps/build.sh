@@ -30,21 +30,24 @@ fi
 export JAYSINCO_SOURCE_REPO=$SOURCE_REPO
 export CONAN_LOG_RUN_TO_FILE=1
 
+function conan_source() {
+    conan source .
+}
+
 function conan_install() {
     conan install \
         --profile=$CONAN_PROFILE \
         --profile:build=$CONAN_PROFILE \
+        --install-folder=out \
         --conf=$CONAN_CONF \
         --build=never \
         . $CONAN_REF
 }
 
-function conan_source() {
-    conan source .
-}
-
 function conan_build() {
-    conan build .
+    conan build \
+        --install-folder=out \
+        .
 }
 
 function conan_export_pkg() {
@@ -76,8 +79,8 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: build.sh [options]"
             echo
             echo "Options:"
-            echo "  -i, --install       conan install"
             echo "  -s, --source        conan source"
+            echo "  -i, --install       conan install"
             echo "  -b, --build         conan build"
             echo "  -e, --export-pkg    conan export-pkg"
             echo "      --export        conan export"
@@ -87,12 +90,12 @@ while [[ $# -gt 0 ]]; do
             echo
             exit 0
             ;;
-        -i|--install)
-            conan_install
-            exit 0
-            ;;
         -s|--source)
             conan_source
+            exit 0
+            ;;
+        -i|--install)
+            conan_install
             exit 0
             ;;
         -b|--build)
@@ -123,7 +126,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 clean_build \
-&& conan_install \
 && conan_source \
+&& conan_install \
 && conan_build \
 && conan_export_pkg

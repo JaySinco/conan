@@ -1,6 +1,2 @@
 /deps/*/out
 /deps/*/src
-/deps/*/conan.lock
-/deps/*/conanbuildinfo.txt
-/deps/*/conaninfo.txt
-/deps/*/graph_info.json

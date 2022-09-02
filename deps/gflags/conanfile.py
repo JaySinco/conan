@@ -40,7 +40,7 @@ class GflagsConan(ConanFile):
 
         self.folders.source = "src"
         self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = build_folder
+        self.folders.generators = os.path.join(build_folder, "generators")
 
     def source(self):
         srcFile = os.path.join(
@@ -80,6 +80,7 @@ class GflagsConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "gflags")
         self.cpp_info.set_property("cmake_target_name", "gflags::gflags")
+        self.cpp_info.set_property("pkg_config_name", "gflags")
         self.cpp_info.libs = collect_libs(self, folder="lib")
         if self.settings.os == "Windows":
             self.cpp_info.system_libs.extend(["shlwapi"])
