@@ -12,7 +12,7 @@ class FmtConan(ConanFile):
     description = "A safe and fast alternative to printf and IOStreams"
     license = "MIT"
 
-    settings = "os", "compiler", "build_type", "arch"
+    settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
@@ -73,7 +73,6 @@ class FmtConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "fmt")
         self.cpp_info.set_property("cmake_target_name", "fmt::fmt")
-        self.cpp_info.set_property("pkg_config_name", "fmt")
         self.cpp_info.libs = collect_libs(self, folder="lib")
         if self.settings.os in ["Linux", "FreeBSD"]:
             self.cpp_info.system_libs.extend(["m"])

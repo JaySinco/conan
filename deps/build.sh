@@ -28,6 +28,7 @@ elif [ $PLATFORM = "win32" ]; then
 fi
 
 export JAYSINCO_SOURCE_REPO=$SOURCE_REPO
+export CONAN_LOG_RUN_TO_FILE=1
 
 function conan_install() {
     conan install \
@@ -50,6 +51,10 @@ function conan_export_pkg() {
     conan export-pkg \
         --force \
         . $CONAN_REF
+}
+
+function conan_export() {
+    conan export . $CONAN_REF
 }
 
 function conan_create() {
@@ -75,6 +80,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -s, --source        conan source"
             echo "  -b, --build         conan build"
             echo "  -e, --export-pkg    conan export-pkg"
+            echo "      --export        conan export"
             echo "      --create        conan create"
             echo "  -c, --clean         clean build output"
             echo "  -h, --help          print command line options"
@@ -95,6 +101,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -e|--export-pkg)
             conan_export_pkg
+            exit 0
+            ;;
+        --export)
+            conan_export
             exit 0
             ;;
         --create)

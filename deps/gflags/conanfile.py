@@ -12,7 +12,7 @@ class GflagsConan(ConanFile):
     description = "The gflags package contains a C++ library that implements commandline flags processing"
     license = "BSD-3-Clause"
 
-    settings = "os", "compiler", "build_type", "arch"
+    settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
@@ -80,7 +80,6 @@ class GflagsConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "gflags")
         self.cpp_info.set_property("cmake_target_name", "gflags::gflags")
-        self.cpp_info.set_property("pkg_config_name", "gflags")
         self.cpp_info.libs = collect_libs(self, folder="lib")
         if self.settings.os == "Windows":
             self.cpp_info.system_libs.extend(["shlwapi"])

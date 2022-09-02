@@ -12,7 +12,7 @@ class SpdlogConan(ConanFile):
     description = "Fast C++ logging library"
     license = "MIT"
 
-    settings = "os", "compiler", "build_type", "arch"
+    settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
@@ -83,9 +83,9 @@ class SpdlogConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "spdlog")
         self.cpp_info.set_property("cmake_target_name", "spdlog::spdlog")
-        self.cpp_info.set_property("pkg_config_name", "spdlog")
         self.cpp_info.libs = collect_libs(self, folder="lib")
         self.cpp_info.defines.append("SPDLOG_COMPILED_LIB")
+        self.cpp_info.defines.append("SPDLOG_FMT_EXTERNAL")
         if self.options.no_exceptions:
             self.cpp_info.defines.append("SPDLOG_NO_EXCEPTIONS")
         if self.settings.os in ["Linux", "FreeBSD"]:
