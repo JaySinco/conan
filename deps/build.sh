@@ -2,131 +2,142 @@
 
 set -e
 
-case "$(uname -m)" in
-    x86_64)   ARCH=x64 ;;
-esac
+build_targets=()
+build_all_targets=0
+build_debug=0
 
-case "$OSTYPE" in
-    linux*)   PLATFORM=linux ;;
-    msys*)    PLATFORM=win32 ;;
-esac
-
-echo "arch: $ARCH"
-echo "platform: $PLATFORM"
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-PROJECT_ROOT="$(git rev-parse --show-toplevel)"
-
-CONAN_REF="jaysinco/stable"
-CONAN_PROFILE="$PROJECT_ROOT/config/$PLATFORM/$ARCH/conan.profile"
-CONAN_CONF="tools.cmake.cmaketoolchain:generator=Ninja"
-
-if [ $PLATFORM = "linux" ]; then
-    SOURCE_REPO="$PROJECT_ROOT/src"
-elif [ $PLATFORM = "win32" ]; then
-    SOURCE_REPO="$HOME/OneDrive/src"
-fi
-
-export JAYSINCO_SOURCE_REPO=$SOURCE_REPO
-export CONAN_LOG_RUN_TO_FILE=1
-
-function conan_source() {
-    conan source .
-}
-
-function conan_install() {
-    conan install \
-        --profile=$CONAN_PROFILE \
-        --profile:build=$CONAN_PROFILE \
-        --install-folder=out \
-        --conf=$CONAN_CONF \
-        --build=never \
-        . $CONAN_REF
-}
-
-function conan_build() {
-    conan build \
-        --install-folder=out \
-        .
-}
-
-function conan_export_pkg() {
-    conan export-pkg \
-        --force \
-        . $CONAN_REF
-}
-
-function conan_export() {
-    conan export . $CONAN_REF
-}
-
-function conan_create() {
-    conan create \
-        --profile=$CONAN_PROFILE \
-        --profile:build=$CONAN_PROFILE \
-        --conf=$CONAN_CONF \
-        . $CONAN_REF
-}
-
-function clean_build() {
-    git clean -fdx .
-}
+do_clean=0
+do_source=0
+do_install=0
+do_build=0
+do_export=0
+do_export_package=0
+do_create=0
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -h|--help)
+        -h)
             echo
-            echo "Usage: build.sh [options]"
+            echo "Usage: build.sh [options] [targets]"
             echo
             echo "Options:"
-            echo "  -s, --source        conan source"
-            echo "  -i, --install       conan install"
-            echo "  -b, --build         conan build"
-            echo "  -e, --export-pkg    conan export-pkg"
-            echo "      --export        conan export"
-            echo "      --create        conan create"
-            echo "  -c, --clean         clean build output"
-            echo "  -h, --help          print command line options"
+            echo "  -c   clean build output"
+            echo "  -s   conan source"
+            echo "  -i   conan install"
+            echo "  -b   conan build"
+            echo "  -e   conan export"
+            echo "  -p   conan export-pkg"
+            echo "  -r   conan create"
+            echo "  -a   build all targets"
+            echo "  -d   build debug version"
+            echo "  -h   print command line options"
             echo
             exit 0
             ;;
-        -s|--source)
-            conan_source
-            exit 0
-            ;;
-        -i|--install)
-            conan_install
-            exit 0
-            ;;
-        -b|--build)
-            conan_build
-            exit 0
-            ;;
-        -e|--export-pkg)
-            conan_export_pkg
-            exit 0
-            ;;
-        --export)
-            conan_export
-            exit 0
-            ;;
-        --create)
-            conan_create
-            exit 0
-            ;;
-        -c|--clean)
-            clean_build
-            exit 0
-            ;;
-        -*|--*)
-            echo "Unknown option: $1"
-            exit 1
-            ;;
+        -c) do_clean=1 && shift ;;
+        -s) do_source=1 && shift ;;
+        -i) do_install=1 && shift ;;
+        -b) do_build=1 && shift ;;
+        -e) do_export=1 && shift ;;
+        -p) do_export_package=1 && shift ;;
+        -r) do_create=1 && shift ;;
+        -a) build_all_targets=1 && shift ;;
+        -d) build_debug=1 && shift ;;
+         *) build_targets+=("$1") && shift ;;
+        -*) echo "Unknown option: $1" && exit 1 ;;
     esac
 done
 
-clean_build \
-&& conan_source \
-&& conan_install \
-&& conan_build \
-&& conan_export_pkg
+case "$(uname -m)" in
+    x86_64)   arch=x64 ;;
+esac
+
+case "$OSTYPE" in
+    linux*)   os=linux ;;
+    msys*)    os=windows ;;
+esac
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+git_root="$(git rev-parse --show-toplevel)"
+
+if [ $os = "linux" ]; then
+    export JAYSINCO_SOURCE_REPO=$git_root/src
+elif [ $os = "windows" ]; then
+    export JAYSINCO_SOURCE_REPO=$HOME/OneDrive/src
+fi
+
+conan_ref="jaysinco/stable"
+conan_profile="$git_root/profiles/$arch-$os.profile"
+conan_build_type=Release
+
+if [ $build_debug -eq 1 ]; then
+    if [ $do_install -ne 1 -a $do_create -ne 1 -a $do_export_package -ne 1 ]; then
+        echo "flag '-d' must be used in conan install/package context" && exit 1
+    fi
+    conan_build_type=Debug
+fi
+
+function do_recipe() {
+    local recipe_dir=$1
+    local install_folder="out/$conan_build_type"
+    local shared_args="\
+        --install-folder=$install_folder \
+        --profile=$conan_profile \
+        --profile:build=$conan_profile \
+        --conf=tools.cmake.cmaketoolchain:generator=Ninja \
+        --settings=build_type=$conan_build_type \
+        "
+
+    cd $recipe_dir
+
+    if [ $do_clean -eq 1 -o $do_create -eq 1 ]; then
+        git clean -fdx $recipe_dir
+    fi
+
+    if [ $do_source -eq 1 -o $do_create -eq 1 ]; then
+        conan source $recipe_dir
+    fi
+
+    if [ $do_install -eq 1 -o $do_create -eq 1 ]; then
+        conan install $shared_args \
+            --build=never \
+            $recipe_dir $conan_ref
+    fi
+
+    if [ $do_build -eq 1 -o $do_create -eq 1 ]; then
+        conan build \
+            --install-folder=$install_folder \
+            $recipe_dir
+    fi
+
+    if [ $do_export -eq 1 ]; then
+        conan export $recipe_dir $conan_ref
+    fi
+
+    if [ $do_export_package -eq 1 -o $do_create -eq 1 ]; then
+        conan export-pkg $shared_args \
+            --force \
+            $recipe_dir $conan_ref
+    fi
+}
+
+if [ $build_all_targets -eq 1 ]; then
+    if [ "${#build_targets[@]}" -ne 0 ]; then
+        echo "flag '-a' conflict with specified target: ${build_targets[@]}" && exit 1
+    fi
+
+    build_targets+=(
+        "gflags"
+        "fmt"
+        "spdlog"
+        "boost"
+    )
+fi
+
+for target in "${build_targets[@]}"; do
+    target_dir=$git_root/deps/$target
+    if [ ! -d "$target_dir" ]; then
+        echo "skip non-existent target '$target'" && continue
+    fi
+    do_recipe $target_dir
+done

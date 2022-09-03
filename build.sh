@@ -60,8 +60,3 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-
-$DEPS_DIR/gflags/build.sh && \
-$DEPS_DIR/fmt/build.sh && \
-$DEPS_DIR/spdlog/build.sh && \
-echo done!

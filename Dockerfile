@@ -97,7 +97,8 @@ ENV PATH="/root/app/lua-language-server/bin:${PATH}"
 RUN git config --global user.name jaysinco \
     && git config --global user.email jaysinco@163.com \
     && git config --global --add safe.directory $WORKSPACE_DIR \
-    && git config --global --add safe.directory /root/.config/nvim
+    && git config --global --add safe.directory /root/.config/nvim \
+    && pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
 # entry
 # -----------------

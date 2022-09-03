@@ -38,23 +38,22 @@ class BoostConan(ConanFile):
     def source(self):
         srcFile = os.path.join(
             tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
-
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
 
     def build(self):
         bootstrap_cmd = "{} {}".format(
             self._bootstrap_exe, self._bootstrap_flags)
-        self.output.info(f"Running {bootstrap_cmd}")
+        self.output.info(f"bootstrap command: {bootstrap_cmd}")
         self.run(command=bootstrap_cmd)
 
         build_cmd = "{} {}".format(self._b2_exe, self._build_flags)
-        self.output.info(f"Running {build_cmd}")
+        self.output.info(f"b2 command: {build_cmd}")
         self.run(command=build_cmd)
 
     def package(self):
         install_cmd = "{} {} install --prefix={}".format(
             self._b2_exe, self._build_flags, self.package_folder)
-        self.output.info(f"Running {install_cmd}")
+        self.output.info(f"b2 command: {install_cmd}")
         self.run(command=install_cmd)
 
         copy(self, "LICENSE_1_0.txt", dst=os.path.join(
@@ -77,6 +76,8 @@ class BoostConan(ConanFile):
             "disable_autolinking")
 
         self.cpp_info.components["all"].libs = collect_libs(self, folder="lib")
+        self.cpp_info.components["all"].set_property(
+            "cmake_target_name", "Boost::all")
         self.cpp_info.components["all"].requires.append("disable_autolinking")
         if self._is_msvc:
             self.cpp_info.components["all"].system_libs.append("bcrypt")

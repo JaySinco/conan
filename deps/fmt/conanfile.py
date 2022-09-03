@@ -35,15 +35,14 @@ class FmtConan(ConanFile):
     def layout(self):
         build_folder = "out"
         build_type = str(self.settings.build_type)
-
         self.folders.source = "src"
         self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = os.path.join(build_folder, "generators")
+        self.folders.generators = os.path.join(
+            self.folders.build, "generators")
 
     def source(self):
         srcFile = os.path.join(
             tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
-
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
 
     def generate(self):
