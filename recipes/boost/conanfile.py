@@ -32,29 +32,28 @@ class BoostConan(ConanFile):
             del self.options.fPIC
 
     def layout(self):
+        build_folder = "out"
+        build_type = str(self.settings.build_type)
         self.folders.source = "src"
-        self.folders.build = "src"
+        self.folders.build = os.path.join(build_folder, build_type)
 
     def source(self):
         srcFile = os.path.join(
             tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
-
-    def build(self):
         bootstrap_cmd = "{} {}".format(
             self._bootstrap_exe, self._bootstrap_flags)
         self.output.info(f"bootstrap command: {bootstrap_cmd}")
-        self.run(command=bootstrap_cmd)
+        self.run(command=bootstrap_cmd, cwd=self.source_folder)
 
-        build_cmd = "{} {}".format(self._b2_exe, self._build_flags)
-        self.output.info(f"b2 command: {build_cmd}")
-        self.run(command=build_cmd)
+    def build(self):
+        pass
 
     def package(self):
         install_cmd = "{} {} install --prefix={}".format(
             self._b2_exe, self._build_flags, self.package_folder)
         self.output.info(f"b2 command: {install_cmd}")
-        self.run(command=install_cmd)
+        self.run(command=install_cmd, cwd=self.source_folder)
 
         copy(self, "LICENSE_1_0.txt", dst=os.path.join(
             self.package_folder, "licenses"), src=self.source_folder)
@@ -141,10 +140,13 @@ class BoostConan(ConanFile):
         flags.append(f"link={'shared' if self.options.shared else 'static'}")
         flags.append(f"architecture={self._b2_architecture}")
         flags.append(f"address-model={self._b2_address_model}")
+        flags.append(f"toolset={self._toolset}")
         flags.append("threading=multi")
         flags.append(f'cxxflags="{self._b2_cxxflags}"')
         flags.append(f"-j{build_jobs(self)}")
         flags.append("--abbreviate-paths")
         flags.append("--layout=system")
+        flags.append("--debug-configuration")
+        flags.append(f"--build-dir={self.build_folder}")
         flags.append("-q")
         return " ".join(flags)

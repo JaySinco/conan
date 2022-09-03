@@ -18,17 +18,21 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         -h)
             echo
-            echo "Usage: build.sh [options] [targets]"
+            echo "Usage: build.sh [targets] [actions] [configs]"
             echo
-            echo "Options:"
-            echo "  -c   clean build output"
+            echo "Targets:"
+            echo "  -a   include all targets"
+            echo
+            echo "Actions:"
+            echo "  -c   clean output"
             echo "  -s   conan source"
             echo "  -i   conan install"
             echo "  -b   conan build"
             echo "  -e   conan export"
             echo "  -p   conan export-pkg"
-            echo "  -r   conan create"
-            echo "  -a   build all targets"
+            echo "  -r   create package by combining all actions"
+            echo
+            echo "Configs:"
             echo "  -d   build debug version"
             echo "  -h   print command line options"
             echo
@@ -80,7 +84,7 @@ fi
 function do_recipe() {
     local recipe_dir=$1
     local install_folder="out/$conan_build_type"
-    local shared_args="\
+    local common_args="\
         --install-folder=$install_folder \
         --profile=$conan_profile \
         --profile:build=$conan_profile \
@@ -99,7 +103,7 @@ function do_recipe() {
     fi
 
     if [ $do_install -eq 1 -o $do_create -eq 1 ]; then
-        conan install $shared_args \
+        conan install $common_args \
             --build=never \
             $recipe_dir $conan_ref
     fi
@@ -115,7 +119,7 @@ function do_recipe() {
     fi
 
     if [ $do_export_package -eq 1 -o $do_create -eq 1 ]; then
-        conan export-pkg $shared_args \
+        conan export-pkg $common_args \
             --force \
             $recipe_dir $conan_ref
     fi
@@ -135,7 +139,7 @@ if [ $build_all_targets -eq 1 ]; then
 fi
 
 for target in "${build_targets[@]}"; do
-    target_dir=$git_root/deps/$target
+    target_dir=$git_root/recipes/$target
     if [ ! -d "$target_dir" ]; then
         echo "skip non-existent target '$target'" && continue
     fi

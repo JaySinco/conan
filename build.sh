@@ -2,61 +2,74 @@
 
 set -e
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-PROJECT_ROOT="$(git rev-parse --show-toplevel)"
-DEPS_DIR=$PROJECT_ROOT/deps
-DOCKER_WORKSPACE_DIR=/workspace
-DOCKER_IMAGE_TAG=build:v1
+do_clean=0
+do_mount=0
+do_unmount=0
+do_build_docker=0
+do_run_docker=0
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -h|--help)
+        -h)
             echo
             echo "Usage: build.sh [options]"
             echo
             echo "Options:"
-            echo "  -m, --mount           mount vbox share"
-            echo "  -u, --umount          unmount vbox share"
-            echo "  -k, --docker-build    build image from dockerfile"
-            echo "  -r, --docker-run      run dev container"
-            echo "  -c, --clean           clean all build output"
-            echo "  -h, --help            print command line options"
+            echo "  -c   clean all output"
+            echo "  -m   mount vbox share"
+            echo "  -u   unmount vbox share"
+            echo "  -k   build docker"
+            echo "  -r   run docker"
+            echo "  -h   print command line options"
             echo
             exit 0
             ;;
-        -m|--mount)
-            mkdir -p $PROJECT_ROOT/src
-            sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
-                share $PROJECT_ROOT/src
-            exit 0
-            ;;
-        -u|--umount)
-            sudo umount -a -t vboxsf
-            exit 0
-            ;;
-        -k|--docker-build)
-            docker build --build-arg WORKSPACE_DIR=$DOCKER_WORKSPACE_DIR \
-                -f $PROJECT_ROOT/Dockerfile \
-                -t $DOCKER_IMAGE_TAG \
-                $PROJECT_ROOT
-            exit 0
-            ;;
-        -r|--docker-run)
-            docker run -it --rm \
-                -v $HOME/.ssh:/root/.ssh:ro \
-                -v $HOME/.config/nvim:/root/.config/nvim:rw \
-                -v $HOME/.local/share/nvim:/root/.local/share/nvim:rw \
-                -v $PROJECT_ROOT:$DOCKER_WORKSPACE_DIR:rw \
-                $DOCKER_IMAGE_TAG
-            exit 0
-            ;;
-        -c|--clean)
-            git clean -fdx
-            exit 0
-            ;;
-        -*|--*)
-            echo "Unknown option: $1"
-            exit 1
-            ;;
+        -c) do_clean=1 && shift ;;
+        -m) do_mount=1 && shift ;;
+        -u) do_unmount=1 && shift ;;
+        -k) do_build_docker=1 && shift ;;
+        -r) do_run_docker=1 && shift ;;
+        -*) echo "Unknown option: $1" && exit 1 ;;
     esac
 done
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+git_root="$(git rev-parse --show-toplevel)"
+
+docker_workspace_dir=/workspace
+docker_image_tag=build:v1
+
+if [ $do_clean -eq 1 ]; then
+    git clean -fdx $git_root
+    exit 0
+fi
+
+if [ $do_mount -eq 1 ]; then
+    mkdir -p $git_root/src
+    sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
+        share $git_root/src
+    exit 0
+fi
+
+if [ $do_unmount -eq 1 ]; then
+    sudo umount -a -t vboxsf
+    exit 0
+fi
+
+if [ $do_build_docker -eq 1 ]; then
+    docker build --build-arg WORKSPACE_DIR=$docker_workspace_dir \
+        -f $git_root/Dockerfile \
+        -t $docker_image_tag \
+        $git_root
+    exit 0
+fi
+
+if [ $do_run_docker -eq 1 ]; then
+    docker run -it --rm \
+        -v $HOME/.ssh:/root/.ssh:ro \
+        -v $HOME/.config/nvim:/root/.config/nvim:rw \
+        -v $HOME/.local/share/nvim:/root/.local/share/nvim:rw \
+        -v $git_root:$docker_workspace_dir:rw \
+        $docker_image_tag
+    exit 0
+fi
