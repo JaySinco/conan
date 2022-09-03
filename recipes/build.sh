@@ -3,7 +3,6 @@
 set -e
 
 build_targets=()
-build_all_targets=0
 build_debug=0
 
 do_clean=0
@@ -19,9 +18,6 @@ while [[ $# -gt 0 ]]; do
         -h)
             echo
             echo "Usage: build.sh [targets] [actions] [configs]"
-            echo
-            echo "Targets:"
-            echo "  -a   include all targets"
             echo
             echo "Actions:"
             echo "  -c   clean output"
@@ -45,7 +41,6 @@ while [[ $# -gt 0 ]]; do
         -e) do_export=1 && shift ;;
         -p) do_export_package=1 && shift ;;
         -r) do_create=1 && shift ;;
-        -a) build_all_targets=1 && shift ;;
         -d) build_debug=1 && shift ;;
          *) build_targets+=("$1") && shift ;;
         -*) echo "Unknown option: $1" && exit 1 ;;
@@ -124,19 +119,6 @@ function do_recipe() {
             $recipe_dir $conan_ref
     fi
 }
-
-if [ $build_all_targets -eq 1 ]; then
-    if [ "${#build_targets[@]}" -ne 0 ]; then
-        echo "flag '-a' conflict with specified target: ${build_targets[@]}" && exit 1
-    fi
-
-    build_targets+=(
-        "gflags"
-        "fmt"
-        "spdlog"
-        "boost"
-    )
-fi
 
 for target in "${build_targets[@]}"; do
     target_dir=$git_root/recipes/$target

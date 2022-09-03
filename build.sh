@@ -3,6 +3,7 @@
 set -e
 
 do_clean=0
+do_build_all=0
 do_mount=0
 do_unmount=0
 do_build_docker=0
@@ -15,7 +16,8 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: build.sh [options]"
             echo
             echo "Options:"
-            echo "  -c   clean all output"
+            echo "  -c   clean all outputs"
+            echo "  -a   build all targets"
             echo "  -m   mount vbox share"
             echo "  -u   unmount vbox share"
             echo "  -k   build docker"
@@ -25,6 +27,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         -c) do_clean=1 && shift ;;
+        -a) do_build_all=1 && shift ;;
         -m) do_mount=1 && shift ;;
         -u) do_unmount=1 && shift ;;
         -k) do_build_docker=1 && shift ;;
@@ -41,6 +44,20 @@ docker_image_tag=build:v1
 
 if [ $do_clean -eq 1 ]; then
     git clean -fdx $git_root
+    exit 0
+fi
+
+if [ $do_build_all -eq 1 ]; then
+    build_targets=(
+        "gflags"
+        "fmt"
+        "spdlog"
+        "boost"
+    )
+    for target in "${build_targets[@]}"; do
+        $git_root/recipes/build.sh $target -r && \
+            $git_root/recipes/build.sh $target -i -b -p -d
+    done
     exit 0
 fi
 
