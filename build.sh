@@ -56,6 +56,8 @@ if [ $do_build_all -eq 1 ]; then
         "glfw"
         "imgui"
         "implot"
+        "expected-lite"
+        "catch2"
     )
     for target in "${build_targets[@]}"; do
         $git_root/recipes/build.sh $target -r && \
