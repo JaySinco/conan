@@ -53,6 +53,9 @@ if [ $do_build_all -eq 1 ]; then
         "fmt"
         "spdlog"
         "boost"
+        "glfw"
+        "imgui"
+        "implot"
     )
     for target in "${build_targets[@]}"; do
         $git_root/recipes/build.sh $target -r && \

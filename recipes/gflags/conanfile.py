@@ -7,7 +7,7 @@ import os
 class GflagsConan(ConanFile):
     name = "gflags"
     version = "2.2.2"
-    url = "https://github.com/JaySinco/conan"
+    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/gflags/gflags"
     description = "The gflags package contains a C++ library that implements commandline flags processing"
     license = "BSD-3-Clause"
@@ -79,6 +79,7 @@ class GflagsConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "gflags")
         self.cpp_info.set_property("cmake_target_name", "gflags::gflags")
+        self.cpp_info.set_property("cmake_target_aliases", ["gflags"])
         self.cpp_info.set_property("pkg_config_name", "gflags")
         self.cpp_info.libs = collect_libs(self, folder="lib")
         if self.settings.os == "Windows":

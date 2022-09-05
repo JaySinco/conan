@@ -1,27 +1,26 @@
 from conans import ConanFile, tools
-from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
+from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
+from conan.tools.microsoft import is_msvc, is_msvc_static_runtime
 import os
 
 
-class SpdlogConan(ConanFile):
-    name = "spdlog"
-    version = "1.10.0"
+class GlfwConan(ConanFile):
+    name = "glfw"
+    version = "3.3.7"
     url = "https://github.com/JaySinco/dev-setup"
-    homepage = "https://github.com/gabime/spdlog"
-    description = "Fast C++ logging library"
-    license = "MIT"
+    homepage = "https://github.com/glfw/glfw"
+    description = "GLFW is a free, Open Source, multi-platform library for OpenGL application development"
+    license = "Zlib"
 
     settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
-        "no_exceptions": [True, False],
     }
     default_options = {
         "shared": False,
         "fPIC": True,
-        "no_exceptions": False,
     }
 
     def config_options(self):
@@ -31,9 +30,6 @@ class SpdlogConan(ConanFile):
     def configure(self):
         if self.options.shared:
             del self.options.fPIC
-
-    def requirements(self):
-        self.requires("fmt/8.1.1@jaysinco/stable")
 
     def layout(self):
         build_folder = "out"
@@ -50,21 +46,14 @@ class SpdlogConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["SPDLOG_BUILD_EXAMPLE"] = False
-        tc.variables["SPDLOG_BUILD_EXAMPLE_HO"] = False
-        tc.variables["SPDLOG_BUILD_TESTS"] = False
-        tc.variables["SPDLOG_BUILD_TESTS_HO"] = False
-        tc.variables["SPDLOG_BUILD_BENCH"] = False
-        tc.variables["SPDLOG_FMT_EXTERNAL"] = True
-        tc.variables["SPDLOG_FMT_EXTERNAL_HO"] = False
-        tc.variables["SPDLOG_BUILD_SHARED"] = self.options.shared
-        tc.variables["SPDLOG_WCHAR_SUPPORT"] = False
-        tc.variables["SPDLOG_WCHAR_FILENAMES"] = False
-        tc.variables["SPDLOG_INSTALL"] = True
-        tc.variables["SPDLOG_NO_EXCEPTIONS"] = self.options.no_exceptions
+        tc.variables["GLFW_BUILD_EXAMPLES"] = False
+        tc.variables["GLFW_BUILD_TESTS"] = False
+        tc.variables["GLFW_BUILD_DOCS"] = False
+        tc.variables["GLFW_INSTALL"] = True
+        if is_msvc(self):
+            tc.variables["USE_MSVC_RUNTIME_LIBRARY_DLL"] = not is_msvc_static_runtime(
+                self)
         tc.generate()
-        cmake_deps = CMakeDeps(self)
-        cmake_deps.generate()
 
     def build(self):
         cmake = CMake(self)
@@ -72,7 +61,7 @@ class SpdlogConan(ConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, "LICENSE", dst=os.path.join(
+        copy(self, "LICENSE*", dst=os.path.join(
             self.package_folder, "licenses"), src=self.source_folder)
         cmake = CMake(self)
         cmake.install()
@@ -80,14 +69,13 @@ class SpdlogConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "spdlog")
-        self.cpp_info.set_property("cmake_target_name", "spdlog::spdlog")
-        self.cpp_info.set_property("pkg_config_name", "spdlog")
-        self.cpp_info.requires = ["fmt::fmt"]
+        self.cpp_info.set_property("cmake_file_name", "glfw3")
+        self.cpp_info.set_property("cmake_target_name", "glfw::glfw")
+        self.cpp_info.set_property("cmake_target_aliases", ["glfw"])
+        self.cpp_info.set_property("pkg_config_name", "glfw3")
         self.cpp_info.libs = collect_libs(self, folder="lib")
-        self.cpp_info.defines.append("SPDLOG_COMPILED_LIB")
-        self.cpp_info.defines.append("SPDLOG_FMT_EXTERNAL")
-        if self.options.no_exceptions:
-            self.cpp_info.defines.append("SPDLOG_NO_EXCEPTIONS")
         if self.settings.os in ["Linux", "FreeBSD"]:
-            self.cpp_info.system_libs.extend(["pthread"])
+            self.cpp_info.system_libs.extend(
+                ["m", "pthread", "dl", "rt", "x11", "gl"])
+        elif self.settings.os == "Windows":
+            self.cpp_info.system_libs.extend(["gdi32", "opengl32"])
