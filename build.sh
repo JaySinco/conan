@@ -47,22 +47,24 @@ if [ $do_clean -eq 1 ]; then
     exit 0
 fi
 
-if [ $do_build_all -eq 1 ]; then
-    build_targets=(
-        "gflags"
-        "fmt"
-        "spdlog"
-        "boost"
-        "glfw"
-        "imgui"
-        "implot"
-        "expected-lite"
-        "catch2"
-    )
+function _b1() {
+    local build_targets=("$@")
+    for target in "${build_targets[@]}"; do
+        $git_root/recipes/build.sh $target -r
+    done
+}
+
+function _b2() {
+    local build_targets=("$@")
     for target in "${build_targets[@]}"; do
         $git_root/recipes/build.sh $target -r && \
             $git_root/recipes/build.sh $target -i -b -p -d
     done
+}
+
+if [ $do_build_all -eq 1 ]; then
+    _b2 gflags fmt spdlog boost glfw imgui implot catch2
+    _b1 expected-lite mujoco
     exit 0
 fi
 
