@@ -47,24 +47,28 @@ if [ $do_clean -eq 1 ]; then
     exit 0
 fi
 
-function _b1() {
-    local build_targets=("$@")
-    for target in "${build_targets[@]}"; do
-        $git_root/recipes/build.sh $target -r
-    done
-}
-
-function _b2() {
-    local build_targets=("$@")
-    for target in "${build_targets[@]}"; do
-        $git_root/recipes/build.sh $target -r && \
-            $git_root/recipes/build.sh $target -i -b -p -d
-    done
+function package() {
+    local build_debug=$1
+    local name=$2
+    $git_root/recipes/build.sh $name -r
+    if [ $build_debug -eq 1 ]; then
+        $git_root/recipes/build.sh $name -r -d
+    fi
 }
 
 if [ $do_build_all -eq 1 ]; then
-    _b2 gflags fmt spdlog boost glfw imgui implot catch2
-    _b1 expected-lite mujoco torch
+    package 1 gflags
+    package 1 fmt
+    package 1 spdlog
+    package 0 boost
+    package 1 glfw
+    package 1 imgui
+    package 1 implot
+    package 1 catch2
+    package 0 qt
+    package 0 expected-lite
+    package 0 mujoco
+    package 0 torch
     exit 0
 fi
 

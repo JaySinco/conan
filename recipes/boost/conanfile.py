@@ -43,43 +43,21 @@ class BoostConan(ConanFile):
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
         bootstrap_cmd = "{} {}".format(
             self._bootstrap_exe, self._bootstrap_flags)
-        self.output.info(f"bootstrap command: {bootstrap_cmd}")
         self.run(command=bootstrap_cmd, cwd=self.source_folder)
+
+    def package_id(self):
+        del self.info.settings.build_type
 
     def package(self):
         install_cmd = "{} {} install --prefix={}".format(
             self._b2_exe, self._build_flags, self.package_folder)
-        self.output.info(f"b2 command: {install_cmd}")
         self.run(command=install_cmd, cwd=self.source_folder)
 
         copy(self, "LICENSE_1_0.txt", dst=os.path.join(
             self.package_folder, "licenses"), src=self.source_folder)
-        rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "Boost")
-
-        self.cpp_info.components["disable_autolinking"].libs = []
-        self.cpp_info.components["disable_autolinking"].set_property(
-            "cmake_target_name", "Boost::disable_autolinking")
-        self.cpp_info.components["disable_autolinking"].defines = [
-            "BOOST_ALL_NO_LIB"]
-
-        self.cpp_info.components["headers"].libs = []
-        self.cpp_info.components["headers"].set_property(
-            "cmake_target_name", "Boost::headers")
-        self.cpp_info.components["headers"].requires.append(
-            "disable_autolinking")
-
-        self.cpp_info.components["all"].libs = collect_libs(self, folder="lib")
-        self.cpp_info.components["all"].set_property(
-            "cmake_target_name", "Boost::all")
-        self.cpp_info.components["all"].requires.append("disable_autolinking")
-        if is_msvc(self):
-            self.cpp_info.components["all"].system_libs.append("bcrypt")
-        elif self.settings.os == "Linux":
-            self.cpp_info.components["all"].system_libs.append("rt")
-            self.cpp_info.components["all"].system_libs.append("pthread")
+        self.cpp_info.set_property("cmake_find_mode", "none")
 
     @property
     def _b2_exe(self):
