@@ -64,7 +64,7 @@ function _b2() {
 
 if [ $do_build_all -eq 1 ]; then
     _b2 gflags fmt spdlog boost glfw imgui implot catch2
-    _b1 expected-lite mujoco
+    _b1 expected-lite mujoco torch
     exit 0
 fi
 

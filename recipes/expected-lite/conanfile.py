@@ -26,9 +26,6 @@ class ExpectedLiteConan(ConanFile):
             tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
 
-    def build(self):
-        pass
-
     def package_id(self):
         self.info.clear()
 

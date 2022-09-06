@@ -67,24 +67,23 @@ fi
 
 conan_ref="jaysinco/stable"
 conan_profile="$git_root/profiles/$arch-$os.profile"
-conan_build_type=Release
+build_type=Release
 
 if [ $build_debug -eq 1 ]; then
     if [ $do_install -ne 1 -a $do_create -ne 1 -a $do_export_package -ne 1 ]; then
         echo "flag '-d' must be used in conan install/package context" && exit 1
     fi
-    conan_build_type=Debug
+    build_type=Debug
 fi
 
 function do_recipe() {
     local recipe_dir=$1
-    local install_folder="out/$conan_build_type"
+    local install_folder="out/$build_type"
     local common_args="\
         --install-folder=$install_folder \
         --profile=$conan_profile \
         --profile:build=$conan_profile \
-        --conf=tools.cmake.cmaketoolchain:generator=Ninja \
-        --settings=build_type=$conan_build_type \
+        --settings=build_type=$build_type \
         "
 
     cd $recipe_dir
