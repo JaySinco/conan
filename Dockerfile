@@ -93,7 +93,7 @@ USER jaysinco
 # install
 # -----------------
 RUN sudo apt-get update -y \
-    && sudo apt-get install -y xclip jq ripgrep \
+    && sudo apt-get install -y xclip jq ripgrep ttf-wqy-microhei \
     && sudo npm install -g typescript-language-server typescript \
     && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
     && pip3 install --no-warn-script-location conan
@@ -105,9 +105,9 @@ COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
      /tmp/
      
 RUN cd /tmp \
-    && sudo tar zxvf nvim-0.7.0-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
+    && sudo tar zxf nvim-0.7.0-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
     && mkdir -p /home/jaysinco/apps/lua-language-server \
-    && tar zxvf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
+    && tar zxf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
     && sudo rm -rf /tmp/*
 
 # config

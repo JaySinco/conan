@@ -97,6 +97,8 @@ if [ $do_run_docker -eq 1 ]; then
         $HOME/.local/share/nvim \
         $HOME/.conan
     docker run -it --rm \
+        -e DISPLAY \
+        -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $HOME/.ssh:/home/jaysinco/.ssh:ro \
         -v $HOME/.config/nvim:/home/jaysinco/.config/nvim:rw \
         -v $HOME/.local/share/nvim:/home/jaysinco/.local/share/nvim:rw \
