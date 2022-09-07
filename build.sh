@@ -38,8 +38,6 @@ done
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 git_root="$(git rev-parse --show-toplevel)"
-
-docker_workspace_dir=/workspace
 docker_image_tag=build:v1
 
 if [ $do_clean -eq 1 ]; then
@@ -85,7 +83,7 @@ if [ $do_unmount -eq 1 ]; then
 fi
 
 if [ $do_build_docker -eq 1 ]; then
-    docker build --build-arg WORKSPACE_DIR=$docker_workspace_dir \
+    docker build \
         -f $git_root/Dockerfile \
         -t $docker_image_tag \
         $git_root
@@ -93,11 +91,17 @@ if [ $do_build_docker -eq 1 ]; then
 fi
 
 if [ $do_run_docker -eq 1 ]; then
+    mkdir -p \
+        $HOME/.ssh \
+        $HOME/.config/nvim \
+        $HOME/.local/share/nvim \
+        $HOME/.conan
     docker run -it --rm \
-        -v $HOME/.ssh:/root/.ssh:ro \
-        -v $HOME/.config/nvim:/root/.config/nvim:rw \
-        -v $HOME/.local/share/nvim:/root/.local/share/nvim:rw \
-        -v $git_root:$docker_workspace_dir:rw \
+        -v $HOME/.ssh:/home/jaysinco/.ssh:ro \
+        -v $HOME/.config/nvim:/home/jaysinco/.config/nvim:rw \
+        -v $HOME/.local/share/nvim:/home/jaysinco/.local/share/nvim:rw \
+        -v $HOME/.conan:/home/jaysinco/.conan:rw \
+        -v $git_root:/home/jaysinco/workspace:rw \
         $docker_image_tag
     exit 0
 fi

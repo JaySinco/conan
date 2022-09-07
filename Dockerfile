@@ -20,8 +20,6 @@ FROM ubuntu:20.04
 # mv *.ttf ~/.local/share/fonts
 # fc-cache -fv
 
-ARG WORKSPACE_DIR
-
 # locale
 # -----------------
 ENV TZ=Asia/Shanghai \
@@ -32,7 +30,7 @@ RUN apt-get update -y \
     && cp /etc/apt/sources.list /etc/apt/sources.list.bak \
     && printf 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse\ndeb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse\ndeb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse\ndeb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse\ndeb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse\ndeb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse\ndeb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse\ndeb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse\n' > /etc/apt/sources.list \
     && apt-get update -y \
-    && apt-get install -y tzdata language-pack-zh-hans \
+    && apt-get install -y apt-utils tzdata language-pack-zh-hans \
     && ln -fs /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone \
     && dpkg-reconfigure --frontend noninteractive tzdata \
@@ -70,37 +68,52 @@ RUN apt-get update -y \
     && ln -s /usr/bin/clangd-13 /usr/bin/clangd \
     && ln -s /usr/bin/clang-format-13 /usr/bin/clang-format
 
-# install
+# build dep
 # -----------------
 RUN apt-get update -y \
     && apt-get build-dep -y qt5-default \
     && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y gdb git git-lfs git-gui nodejs zip tcl tk-dev jq ripgrep \
-    && npm install -g typescript-language-server typescript
+    && apt-get install -y sudo gdb git git-lfs git-gui python3 python3-pip \
+    	nodejs zip tcl tk-dev
 
+# user
+# -----------------
+RUN useradd -u 1000 -m jaysinco \
+    && usermod -aG sudo jaysinco \
+    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# copy files
+# -----------------
 COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
      src/lua-language-server-3.2.5-linux-x64.tar.gz \
      /tmp/
-
-RUN apt-get update -y \
-    && apt-get install -y xclip \
-    && cd /tmp \
+     
+RUN cd /tmp \
     && tar zxvf nvim-0.7.0-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
-    && mkdir -p /root/app/lua-language-server \
-    && tar zxvf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/root/app/lua-language-server \
+    && mkdir -p /home/jaysinco/apps/lua-language-server \
+    && tar zxvf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
     && rm -f *.tar.gz
+    
+# install
+# -----------------
+RUN apt-get update -y \
+    && apt-get install -y xclip jq ripgrep \
+    && npm install -g typescript-language-server typescript \
+    && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    && pip3 install conan
 
 # config
 # -----------------
-ENV PATH="/root/app/lua-language-server/bin:${PATH}"
+ENV PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}"
 
 RUN git config --global user.name jaysinco \
     && git config --global user.email jaysinco@163.com \
-    && git config --global --add safe.directory $WORKSPACE_DIR \
-    && git config --global --add safe.directory /root/.config/nvim \
-    && pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+    && git config --global --add safe.directory /home/jaysinco/workspace \
+    && git config --global --add safe.directory /home/jaysinco/.config/nvim
 
 # entry
 # -----------------
-WORKDIR $WORKSPACE_DIR
+USER jaysinco
+WORKDIR /home/jaysinco/workspace
 ENTRYPOINT ["/bin/bash"]
+
