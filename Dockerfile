@@ -68,52 +68,49 @@ RUN apt-get update -y \
     && ln -s /usr/bin/clangd-13 /usr/bin/clangd \
     && ln -s /usr/bin/clang-format-13 /usr/bin/clang-format
 
-# build dep
+# devpkg
 # -----------------
 RUN apt-get update -y \
-    && apt-get build-dep -y qt5-default \
-    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y sudo gdb git git-lfs git-gui python3 python3-pip \
-    	nodejs zip tcl tk-dev
-
-# user
-# -----------------
-RUN useradd -u 1000 -m jaysinco \
-    && usermod -aG sudo jaysinco \
-    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-# copy files
-# -----------------
-COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
-     src/lua-language-server-3.2.5-linux-x64.tar.gz \
-     /tmp/
-     
-RUN cd /tmp \
-    && tar zxvf nvim-0.7.0-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
-    && mkdir -p /home/jaysinco/apps/lua-language-server \
-    && tar zxvf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
-    && rm -f *.tar.gz
+    && apt-get build-dep -y qt5-default
     
-# install
-# -----------------
+RUN apt-get update -y \
+    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y gdb zip git git-lfs git-gui \
+    	python3 python3-pip nodejs
+
 RUN apt-get update -y \
     && apt-get install -y xclip jq ripgrep \
     && npm install -g typescript-language-server typescript \
     && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
     && pip3 install conan
 
+# switch user
+# -----------------
+RUN apt-get update -y \
+    && apt-get install -y sudo \
+    && useradd -u 1000 -m jaysinco \
+    && usermod -aG sudo jaysinco \
+    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER jaysinco
+
+COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
+     src/lua-language-server-3.2.5-linux-x64.tar.gz \
+     /tmp/
+     
+RUN cd /tmp \
+    && sudo tar zxvf nvim-0.7.0-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
+    && mkdir -p /home/jaysinco/apps/lua-language-server \
+    && tar zxvf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
+    && sudo rm -rf /tmp/*
+
 # config
 # -----------------
 ENV PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}"
 
 RUN git config --global user.name jaysinco \
-    && git config --global user.email jaysinco@163.com \
-    && git config --global --add safe.directory /home/jaysinco/workspace \
-    && git config --global --add safe.directory /home/jaysinco/.config/nvim
+    && git config --global user.email jaysinco@163.com
 
-# entry
-# -----------------
-USER jaysinco
 WORKDIR /home/jaysinco/workspace
 ENTRYPOINT ["/bin/bash"]
 
