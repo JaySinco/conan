@@ -73,12 +73,12 @@ RUN apt-get update -y \
 RUN apt-get update -y \
     && apt-get build-dep -y qt5-default
 
-# common tools
+# common utils
 # -----------------
 RUN apt-get update -y \
     && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y gdb zip git git-lfs git-gui \
-    	python3 python3-pip nodejs
+    && apt-get install -y gdb zip git git-lfs git-gui ninja-build \
+        python3 python3-pip nodejs ttf-wqy-microhei
 
 # switch user
 # -----------------
@@ -93,8 +93,8 @@ USER jaysinco
 # install
 # -----------------
 RUN sudo apt-get update -y \
-    && sudo apt-get install -y xclip jq ripgrep ttf-wqy-microhei \
-    && sudo npm install -g typescript-language-server typescript \
+    && sudo apt-get install -y xclip jq ripgrep \
+    && sudo npm install -g typescript-language-server typescript pyright \
     && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
     && pip3 install --no-warn-script-location conan
 

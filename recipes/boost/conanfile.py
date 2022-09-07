@@ -61,11 +61,11 @@ class BoostConan(ConanFile):
 
     @property
     def _b2_exe(self):
-        return "b2.exe" if tools.os_info.is_windows else "b2"
+        return "b2.exe" if tools.os_info.is_windows else "./b2"
 
     @property
     def _bootstrap_exe(self):
-        return "bootstrap.bat" if tools.os_info.is_windows else "bootstrap.sh"
+        return "bootstrap.bat" if tools.os_info.is_windows else "./bootstrap.sh"
 
     @property
     def _toolset(self):
@@ -90,13 +90,26 @@ class BoostConan(ConanFile):
         if str(self.settings.arch) in ("x86_64"):
             return "64"
         return "32"
+ 
+    @property
+    def _b2_stdlib(self):
+        return { "libstdc++11": "libstdc++" }.get(str(self.settings.compiler.libcxx), str(self.settings.compiler.libcxx))
 
     @property
     def _b2_cxxflags(self):
         cxx_flags = []
         if self.options.get_safe("fPIC"):
             cxx_flags.append("-fPIC")
+        if self.settings.compiler in ("clang", "apple-clang"):
+            link_flags.append(f"-stdlib={self._b2_stdlib}")
         return " ".join(cxx_flags)
+
+    @property
+    def _b2_linkflags(self):
+        link_flags = []
+        if self.settings.compiler in ("clang", "apple-clang"):
+            link_flags.append(f"-stdlib={self._b2_stdlib}")
+        return " ".join(link_flags)
 
     @property
     def _build_flags(self):
@@ -114,6 +127,7 @@ class BoostConan(ConanFile):
         flags.append(f"toolset={self._toolset}")
         flags.append("threading=multi")
         flags.append(f'cxxflags="{self._b2_cxxflags}"')
+        flags.append(f'linkflags="{self._b2_linkflags}"')
         flags.append(f"-j{build_jobs(self)}")
         flags.append("--abbreviate-paths")
         flags.append("--layout=system")
