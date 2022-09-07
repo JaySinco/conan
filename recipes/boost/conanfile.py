@@ -2,6 +2,7 @@ from conans import ConanFile, tools
 from conan.tools.files import collect_libs, copy, rmdir
 from conan.tools.microsoft import msvc_runtime_flag, is_msvc
 from conan.tools.build import build_jobs
+from conan.errors import ConanException
 import os
 
 
@@ -90,10 +91,24 @@ class BoostConan(ConanFile):
         if str(self.settings.arch) in ("x86_64"):
             return "64"
         return "32"
- 
+
+    @property
+    def _gnu_cxx11_abi(self):
+        try:
+            if str(self.settings.compiler.libcxx) == "libstdc++":
+                return "0"
+            if str(self.settings.compiler.libcxx) == "libstdc++11":
+                return "1"
+        except ConanException:
+            pass
+        return None
+
     @property
     def _b2_stdlib(self):
-        return { "libstdc++11": "libstdc++" }.get(str(self.settings.compiler.libcxx), str(self.settings.compiler.libcxx))
+        return { "libstdc++11": "libstdc++" }.get(
+            str(self.settings.compiler.libcxx),
+            str(self.settings.compiler.libcxx)
+        )
 
     @property
     def _b2_cxxflags(self):
@@ -101,7 +116,7 @@ class BoostConan(ConanFile):
         if self.options.get_safe("fPIC"):
             cxx_flags.append("-fPIC")
         if self.settings.compiler in ("clang", "apple-clang"):
-            link_flags.append(f"-stdlib={self._b2_stdlib}")
+            cxx_flags.append(f"-stdlib={self._b2_stdlib}")
         return " ".join(cxx_flags)
 
     @property
@@ -121,6 +136,8 @@ class BoostConan(ConanFile):
         if is_msvc(self):
             flags.append(
                 "runtime-link={}".format('static' if 'MT' in msvc_runtime_flag(self) else 'shared'))
+        if self._gnu_cxx11_abi:
+            flags.append(f"define=_GLIBCXX_USE_CXX11_ABI={self._gnu_cxx11_abi}")
         flags.append(f"link={'shared' if self.options.shared else 'static'}")
         flags.append(f"architecture={self._b2_architecture}")
         flags.append(f"address-model={self._b2_address_model}")

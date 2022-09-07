@@ -1,0 +1,17 @@
+{
+    "recommendations": [
+        "eamodio.gitlens",
+        "gurumukhi.selected-lines-count",
+        "jeff-hykin.better-cpp-syntax",
+        "jeff-hykin.better-dockerfile-syntax",
+        "jeff-hykin.better-shellscript-syntax",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "MS-CEINTL.vscode-language-pack-zh-hans",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-vscode.cpptools",
+        "ms-vscode.hexeditor",
+        "twxs.cmake",
+        "vscode-icons-team.vscode-icons"
+    ]
+}

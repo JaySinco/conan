@@ -90,7 +90,7 @@ class QtConan(ConanFile):
 
     @property
     def _configure_exe(self):
-        return "configure.bat" if tools.os_info.is_windows else "configure"
+        return "configure.bat" if tools.os_info.is_windows else "./configure"
 
     @property
     def _config_flags(self):
@@ -110,6 +110,10 @@ class QtConan(ConanFile):
             flags.append("-debug")
         else:
             flags.append("-release")
+        if self.settings.get_safe("compiler.libcxx") == "libstdc++":
+            flags.append("-D_GLIBCXX_USE_CXX11_ABI=0")
+        elif self.settings.get_safe("compiler.libcxx") == "libstdc++11":
+            flags.append("-D_GLIBCXX_USE_CXX11_ABI=1")
         flags.append("--opengl=desktop")
         flags.append("--c++std=c++17")
         return " ".join(flags)
