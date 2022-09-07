@@ -68,21 +68,17 @@ RUN apt-get update -y \
     && ln -s /usr/bin/clangd-13 /usr/bin/clangd \
     && ln -s /usr/bin/clang-format-13 /usr/bin/clang-format
 
-# devpkg
+# Qt5 build deps
 # -----------------
 RUN apt-get update -y \
     && apt-get build-dep -y qt5-default
-    
+
+# common tools
+# -----------------
 RUN apt-get update -y \
     && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y gdb zip git git-lfs git-gui \
     	python3 python3-pip nodejs
-
-RUN apt-get update -y \
-    && apt-get install -y xclip jq ripgrep \
-    && npm install -g typescript-language-server typescript \
-    && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-    && pip3 install conan
 
 # switch user
 # -----------------
@@ -94,6 +90,16 @@ RUN apt-get update -y \
 
 USER jaysinco
 
+# install
+# -----------------
+RUN sudo apt-get update -y \
+    && sudo apt-get install -y xclip jq ripgrep \
+    && sudo npm install -g typescript-language-server typescript \
+    && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    && pip3 install --no-warn-script-location conan
+
+# copy files
+# -----------------
 COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
      src/lua-language-server-3.2.5-linux-x64.tar.gz \
      /tmp/
@@ -108,7 +114,8 @@ RUN cd /tmp \
 # -----------------
 ENV PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}"
 
-RUN git config --global user.name jaysinco \
+RUN mkdir -p /home/jaysinco/.local/share \
+    && git config --global user.name jaysinco \
     && git config --global user.email jaysinco@163.com
 
 WORKDIR /home/jaysinco/workspace
