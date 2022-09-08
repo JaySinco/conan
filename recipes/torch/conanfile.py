@@ -1,5 +1,5 @@
 from conans import ConanFile, tools
-from conan.tools.files import rmdir, rm
+from conan.tools.files import rmdir, rm, rename
 from conan.tools.microsoft import is_msvc
 import os
 import glob
@@ -30,13 +30,11 @@ class TorchConan(ConanFile):
         srcFile = os.path.join(
             tools.get_env("JAYSINCO_SOURCE_REPO"), self._src_file)
         tools.unzip(srcFile, destination=self.package_folder, strip_root=True)
+        rename(self, os.path.join(self.package_folder, "share", "cmake"),
+            os.path.join(self.package_folder, "lib", "cmake"))
         rm(self, "build-hash",  self.package_folder)
-        rmdir(self, os.path.join(self.package_folder, "cmake"))
         rmdir(self, os.path.join(self.package_folder, "share"))
         rmdir(self, os.path.join(self.package_folder, "test"))
-        files = glob.glob(os.path.join(self.package_folder, "lib", "*.dll"))
-        for file in files:
-            shutil.move(file, os.path.join(self.package_folder, "bin"))
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "torch")
@@ -69,6 +67,6 @@ class TorchConan(ConanFile):
     @property
     def _src_file(self):
         if self.settings.os == "Linux":
-            return "libtorch-cxx11-abi-shared-with-deps-{}+cpu".format(self.version)
+            return "libtorch-cxx11-abi-shared-with-deps-{}+cpu.zip".format(self.version)
         else:
             return "libtorch-win-shared-with-deps-{}+cu111.zip".format(self.version)
