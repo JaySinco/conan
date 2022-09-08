@@ -22,7 +22,8 @@ class MujocoConan(ConanFile):
     def build(self):
         srcFile = os.path.join(
             tools.get_env("JAYSINCO_SOURCE_REPO"), self._src_file)
-        tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
+        strip_root = True if self.settings.os == "Linux" else False
+        tools.unzip(srcFile, destination=self.source_folder, strip_root=strip_root)
 
     def package_id(self):
         del self.info.settings.compiler
@@ -31,10 +32,12 @@ class MujocoConan(ConanFile):
     def package(self):
         copy(self, "*.*", dst=os.path.join(self.package_folder, "lib"),
              src=os.path.join(self.source_folder, "lib"))
-        copy(self, "*.dll", dst=os.path.join(self.package_folder, "bin"),
-             src=os.path.join(self.source_folder, "lib"))
         copy(self, "*.h", dst=os.path.join(self.package_folder, "include"),
              src=os.path.join(self.source_folder, "include"))
+        if self.settings.os == "Windows":
+            copy(self, "*.dll", dst=os.path.join(self.package_folder, "bin"),
+             src=os.path.join(self.source_folder, "bin"))
+
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "mujoco")

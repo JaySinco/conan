@@ -30,16 +30,22 @@ class TorchConan(ConanFile):
         srcFile = os.path.join(
             tools.get_env("JAYSINCO_SOURCE_REPO"), self._src_file)
         tools.unzip(srcFile, destination=self.package_folder, strip_root=True)
-        rename(self, os.path.join(self.package_folder, "share", "cmake"),
-            os.path.join(self.package_folder, "lib", "cmake"))
-        rm(self, "build-hash",  self.package_folder)
-        rmdir(self, os.path.join(self.package_folder, "share"))
+
+        if self.settings.os == "Windows":
+            rm(self, "*.exe",  os.path.join(self.package_folder, "bin"))
+            files = glob.glob(os.path.join(self.package_folder, "lib", "*.dll"))
+            for file in files:
+                shutil.move(file, os.path.join(self.package_folder, "bin"))
+
+        rm(self, "build-*",  self.package_folder)
         rmdir(self, os.path.join(self.package_folder, "test"))
+        rmdir(self, os.path.join(self.package_folder, "cmake"))
+        rmdir(self, os.path.join(self.package_folder, "share"))
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "torch")
-        self.cpp_info.set_property("cmake_target_name", "torch::torch")
-        self.cpp_info.set_property("pkg_config_name", "torch")
+        self.cpp_info.set_property("cmake_file_name", "Torch")
+        self.cpp_info.set_property("cmake_target_name", "Torch::torch")
+        self.cpp_info.set_property("pkg_config_name", "Torch")
         self.cpp_info.includedirs = [
             "include",
             "include/torch/csrc/api/include",
