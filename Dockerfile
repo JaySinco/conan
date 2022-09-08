@@ -112,7 +112,10 @@ RUN cd /tmp \
 
 # config
 # -----------------
-ENV PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}"
+ENV XDG_RUNTIME_DIR=/tmp/xdg-runtime-root \
+    NO_AT_BRIDGE=1 \
+    PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}" \
+    LD_LIBRARY_PATH="/home/jaysinco/.conan/data/torch/1.8.2/jaysinco/stable/package/4db1be536558d833e52e862fd84d64d75c2b3656/lib"
 
 RUN mkdir -p /home/jaysinco/.local/share \
     && git config --global user.name jaysinco \

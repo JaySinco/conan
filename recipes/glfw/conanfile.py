@@ -76,6 +76,6 @@ class GlfwConan(ConanFile):
         self.cpp_info.libs = collect_libs(self, folder="lib")
         if self.settings.os in ["Linux", "FreeBSD"]:
             self.cpp_info.system_libs.extend(
-                ["m", "pthread", "dl", "rt", "x11", "gl"])
+                ["m", "pthread", "dl", "rt", "X11", "GL"])
         elif self.settings.os == "Windows":
             self.cpp_info.system_libs.extend(["gdi32", "opengl32"])

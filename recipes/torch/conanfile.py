@@ -52,9 +52,8 @@ class TorchConan(ConanFile):
         ]
         if self.settings.os == "Linux":
             self.cpp_info.libs = [
-                "c10",
-                "gomp-75eea7e8",
-                "torch_cpu",
+                "libc10.so",
+                "libtorch_cpu.so",
             ]
         elif self.settings.os == "Windows":
             self.cpp_info.libs = [
