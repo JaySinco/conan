@@ -71,8 +71,8 @@ class QhullConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "share"))
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "Qhull")
-        self.cpp_info.set_property("cmake_target_name", f"Qhull::{self._qhull_cmake_name}")
+        self.cpp_info.set_property("cmake_file_name", "qhull")
+        self.cpp_info.set_property("cmake_target_name", f"qhull::{self._qhull_cmake_name}")
         self.cpp_info.set_property("cmake_target_aliases", [self._qhull_cmake_name])
         self.cpp_info.set_property("pkg_config_name", self._qhull_pkgconfig_name)
         self.cpp_info.includedirs = [

@@ -21,7 +21,7 @@ class LibccdConan(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": True,
-        "enable_double_precision": False,
+        "enable_double_precision": True,
     }
 
     def config_options(self):
