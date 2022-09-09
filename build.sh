@@ -2,7 +2,6 @@
 
 set -e
 
-do_clean=0
 do_build_all=0
 do_mount=0
 do_unmount=0
@@ -17,7 +16,6 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: build.sh [options]"
             echo
             echo "Options:"
-            echo "  -c   clean all outputs"
             echo "  -a   build all targets"
             echo "  -m   mount vbox share"
             echo "  -u   unmount vbox share"
@@ -28,7 +26,6 @@ while [[ $# -gt 0 ]]; do
             echo
             exit 0
             ;;
-        -c) do_clean=1 && shift ;;
         -a) do_build_all=1 && shift ;;
         -m) do_mount=1 && shift ;;
         -u) do_unmount=1 && shift ;;
@@ -42,11 +39,6 @@ done
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 git_root="$(git rev-parse --show-toplevel)"
 docker_image_tag=build:v1
-
-if [ $do_clean -eq 1 ]; then
-    git clean -fdx $git_root
-    exit 0
-fi
 
 function package() {
     local build_debug=$1
@@ -68,8 +60,8 @@ if [ $do_build_all -eq 1 ]; then
     package 1 catch2
     package 0 qt
     package 0 expected-lite
-    package 0 mujoco
     package 0 torch
+    package 1 mujoco
     exit 0
 fi
 

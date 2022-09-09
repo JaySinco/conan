@@ -89,7 +89,7 @@ function do_recipe() {
     cd $recipe_dir
 
     if [ $do_clean -eq 1 -o $do_create -eq 1 ]; then
-        git clean -fdx $recipe_dir
+        rm -rf $recipe_dir/out $recipe_dir/src
     fi
 
     if [ $do_source -eq 1 -o $do_create -eq 1 ]; then

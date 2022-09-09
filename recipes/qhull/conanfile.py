@@ -1,16 +1,17 @@
 from conans import ConanFile, tools
-from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
+from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
+from conan.tools.microsoft import is_msvc
 import os
 
 
-class MujocoConan(ConanFile):
-    name = "mujoco"
-    version = "2.2.2"
+class QhullConan(ConanFile):
+    name = "qhull"
+    version = "8.0.2"
     url = "https://github.com/JaySinco/dev-setup"
-    homepage = "https://github.com/deepmind/mujoco"
-    description = "Multi-Joint dynamics with Contact. A general purpose physics simulator"
-    license = "Apache-2.0"
+    homepage = "http://www.qhull.org"
+    description = "Qhull computes the convex hull, Delaunay triangulation, Voronoi diagram, halfspace intersection about a point, furthest-site Delaunay triangulation, and furthest-site Voronoi diagram"
+    license = "Qhull"
 
     settings = "os", "arch", "compiler", "build_type"
     options = {
@@ -18,7 +19,7 @@ class MujocoConan(ConanFile):
         "fPIC": [True, False],
     }
     default_options = {
-        "shared": True,
+        "shared": False,
         "fPIC": True,
     }
 
@@ -42,16 +43,11 @@ class MujocoConan(ConanFile):
         srcFile = os.path.join(
             tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
+        self._patch_sources()
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["MUJOCO_BUILD_EXAMPLES"] = False
-        tc.variables["MUJOCO_BUILD_SIMULATE"] = False
-        tc.variables["MUJOCO_BUILD_TESTS"] = False
-        tc.variables["MUJOCO_TEST_PYTHON_UTIL"] = False
         tc.generate()
-        cmake_deps = CMakeDeps(self)
-        cmake_deps.generate()
 
     def build(self):
         cmake = CMake(self)
@@ -59,15 +55,22 @@ class MujocoConan(ConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, "LICENSE", dst=os.path.join(
+        copy(self, "COPYING.txt", dst=os.path.join(
             self.package_folder, "licenses"), src=self.source_folder)
         cmake = CMake(self)
         cmake.install()
+        rmdir(self, os.path.join(self.package_folder, "doc"))
+        rmdir(self, os.path.join(self.package_folder, "man"))
         rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
-        rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
+        rmdir(self, os.path.join(self.package_folder, "share"))
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "mujoco")
-        self.cpp_info.set_property("cmake_target_name", "mujoco::mujoco")
-        self.cpp_info.set_property("pkg_config_name", "mujoco")
-        self.cpp_info.libs = collect_libs(self, folder="lib")
+        self.cpp_info.set_property("cmake_find_mode", "none")
+
+    def _patch_sources(self):
+        patches = [
+            "0001-fix-cmake-minimum-required-location.patch"
+        ]
+        dirname = os.path.dirname(os.path.abspath(__file__))
+        for pat in patches:
+            tools.patch(self.source_folder, os.path.join(dirname, "patches", pat))
