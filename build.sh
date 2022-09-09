@@ -50,23 +50,25 @@ function package() {
 }
 
 if [ $do_build_all -eq 1 ]; then
-    package 1 gflags
-    package 1 fmt
-    package 1 spdlog
-    package 0 boost
-    package 1 glfw
-    package 1 imgui
-    package 1 implot
-    package 1 catch2
-    package 0 qt
-    package 0 expected-lite
-    package 1 qhull
-    package 1 lodepng
-    package 1 libccd
-    package 1 tinyobjloader
-    package 1 tinyxml2
-    package 1 mujoco
-    package 0 torch
+    echo start! \
+    && package 1 gflags \
+    && package 1 fmt \
+    && package 1 spdlog \
+    && package 0 boost \
+    && package 1 glfw \
+    && package 1 imgui \
+    && package 1 implot \
+    && package 1 catch2 \
+    && package 0 qt \
+    && package 0 expected-lite \
+    && package 1 qhull \
+    && package 1 lodepng \
+    && package 1 libccd \
+    && package 1 tinyobjloader \
+    && package 1 tinyxml2 \
+    && package 1 mujoco \
+    && package 0 torch \
+    && echo done!
     exit 0
 fi
 
