@@ -1,25 +1,27 @@
 from conans import ConanFile, tools
-from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
+from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
 import os
 
 
-class MujocoConan(ConanFile):
-    name = "mujoco"
-    version = "2.2.2"
+class TinyObjLoaderConan(ConanFile):
+    name = "tinyobjloader"
+    version = "1.0.6"
     url = "https://github.com/JaySinco/dev-setup"
-    homepage = "https://github.com/deepmind/mujoco"
-    description = "Multi-Joint dynamics with Contact. A general purpose physics simulator"
-    license = "Apache-2.0"
+    homepage = "https://github.com/tinyobjloader/tinyobjloader"
+    description = "Tiny but powerful single file wavefront obj loader"
+    license = "MIT"
 
     settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
+        "double": [True, False],
     }
     default_options = {
-        "shared": True,
+        "shared": False,
         "fPIC": True,
+        "double": False,
     }
 
     def config_options(self):
@@ -29,11 +31,6 @@ class MujocoConan(ConanFile):
     def configure(self):
         if self.options.shared:
             del self.options.fPIC
-
-    def requirements(self):
-        self.requires("libccd/2.1@jaysinco/stable")
-        self.requires("qhull/8.0.2@jaysinco/stable")
-        self.requires("lodepng/cci.20220718@jaysinco/stable")
 
     def layout(self):
         build_folder = "out"
@@ -51,13 +48,13 @@ class MujocoConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["MUJOCO_BUILD_EXAMPLES"] = False
-        tc.variables["MUJOCO_BUILD_SIMULATE"] = False
-        tc.variables["MUJOCO_BUILD_TESTS"] = False
-        tc.variables["MUJOCO_TEST_PYTHON_UTIL"] = False
+        tc.variables["TINYOBJLOADER_USE_DOUBLE"] = self.options.double
+        tc.variables["TINYOBJLOADER_BUILD_TEST_LOADER"] = False
+        tc.variables["TINYOBJLOADER_COMPILATION_SHARED"] = self.options.shared
+        tc.variables["TINYOBJLOADER_BUILD_OBJ_STICHER"] = False
+        tc.variables["CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS"] = True
+        tc.variables["CMAKE_INSTALL_DOCDIR"] = "licenses"
         tc.generate()
-        cmake_deps = CMakeDeps(self)
-        cmake_deps.generate()
 
     def build(self):
         cmake = CMake(self)
@@ -65,22 +62,24 @@ class MujocoConan(ConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, "LICENSE", dst=os.path.join(
-            self.package_folder, "licenses"), src=self.source_folder)
         cmake = CMake(self)
         cmake.install()
         rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
-        rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
+        rmdir(self, os.path.join(self.package_folder, "lib", "tinyobjloader"))
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "mujoco")
-        self.cpp_info.set_property("cmake_target_name", "mujoco::mujoco")
-        self.cpp_info.set_property("pkg_config_name", "mujoco")
-        self.cpp_info.libs = collect_libs(self, folder="lib")
+        suffix = "_double" if self.options.double else ""
+        name = "tinyobjloader{}".format(suffix)
+        self.cpp_info.set_property("cmake_file_name", "tinyobjloader")
+        self.cpp_info.set_property("cmake_target_name", name)
+        self.cpp_info.set_property("pkg_config_name", name)
+        self.cpp_info.libs = [name]
+        if self.options.double:
+            self.cpp_info.defines.append("TINYOBJLOADER_USE_DOUBLE")
 
     def _patch_sources(self):
         patches = [
-            "0001-fix-cmake-findorfetch-dependencies.patch"
+            "0001-fix-cmake-minimum-required-location.patch"
         ]
         dirname = os.path.dirname(os.path.abspath(__file__))
         for pat in patches:
