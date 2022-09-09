@@ -6,7 +6,7 @@ import os
 
 class TinyObjLoaderConan(ConanFile):
     name = "tinyobjloader"
-    version = "1.0.6"
+    version = "cci.20200228"
     url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/tinyobjloader/tinyobjloader"
     description = "Tiny but powerful single file wavefront obj loader"
@@ -42,7 +42,7 @@ class TinyObjLoaderConan(ConanFile):
 
     def source(self):
         srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
+            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.zip" % (self.name, self.version))
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
         self._patch_sources()
 
