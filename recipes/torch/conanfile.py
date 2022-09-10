@@ -65,8 +65,6 @@ class TorchConan(ConanFile):
         if is_msvc(self):
             self.cpp_info.cxxflags = [
                 "/W0",
-                "-INCLUDE:?warp_size@cuda@at@@YAHXZ",
-                "-INCLUDE:?searchsorted_cuda@native@at@@YA?AVTensor@2@AEBV32@0_N1@Z"
             ]
 
     @property

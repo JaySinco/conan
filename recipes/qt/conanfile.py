@@ -63,23 +63,26 @@ class QtConan(ConanFile):
         self.cpp_info.set_property("cmake_find_mode", "none")
 
     def _configure(self, name):
-        config_cmd = "{} {}".format(self._configure_exe, self._config_flags)
-        self.run(command=config_cmd,
-                 cwd=os.path.join(self.source_folder, name))
+        with tools.vcvars(self) if is_msvc(self) else tools.no_op():
+            config_cmd = "{} {}".format(self._configure_exe, self._config_flags)
+            self.run(command=config_cmd,
+                    cwd=os.path.join(self.source_folder, name))
 
     def _build_and_install(self, name):
-        build_cmd = "{} {}".format(self._make_exe, self._build_flags)
-        self.run(command=build_cmd,
-                 cwd=os.path.join(self.source_folder, name))
+        with tools.vcvars(self) if is_msvc(self) else tools.no_op():
+            build_cmd = "{} {}".format(self._make_exe, self._build_flags)
+            self.run(command=build_cmd,
+                    cwd=os.path.join(self.source_folder, name))
 
-        install_cmd = "{} install".format(self._make_exe)
-        self.run(command=install_cmd,
-                 cwd=os.path.join(self.source_folder, name))
+            install_cmd = "{} install".format(self._make_exe)
+            self.run(command=install_cmd,
+                    cwd=os.path.join(self.source_folder, name))
 
     def _run_qmake(self, name):
-        qmake_cmd = os.path.join(self.package_folder, "bin", "qmake")
-        self.run(command=qmake_cmd,
-                 cwd=os.path.join(self.source_folder, name))
+        with tools.vcvars(self) if is_msvc(self) else tools.no_op():
+            qmake_cmd = os.path.join(self.package_folder, "bin", "qmake")
+            self.run(command=qmake_cmd,
+                    cwd=os.path.join(self.source_folder, name))
 
     def _get_source(self, name):
         srcFile = os.path.join(
@@ -87,6 +90,30 @@ class QtConan(ConanFile):
             "{}-everywhere-opensource-src-{}.tar.xz".format(name, self.version))
         tools.unzip(srcFile, destination=os.path.join(
             self.source_folder, name), strip_root=True)
+
+    def _xplatform(self):
+        if self.settings.os == "Linux":
+            if self.settings.compiler == "gcc":
+                return {"x86": "linux-g++-32",
+                        "armv6": "linux-arm-gnueabi-g++",
+                        "armv7": "linux-arm-gnueabi-g++",
+                        "armv7hf": "linux-arm-gnueabi-g++",
+                        "armv8": "linux-aarch64-gnu-g++"}.get(str(self.settings.arch), "linux-g++")
+            elif self.settings.compiler == "clang":
+                if self.settings.arch == "x86":
+                    return "linux-clang-libc++-32" if self.settings.compiler.libcxx == "libc++" else "linux-clang-32"
+                elif self.settings.arch == "x86_64":
+                    return "linux-clang-libc++" if self.settings.compiler.libcxx == "libc++" else "linux-clang"
+
+        elif self.settings.os == "Windows":
+            return {
+                "Visual Studio": "win32-msvc",
+                "msvc": "win32-msvc",
+                "gcc": "win32-g++",
+                "clang": "win32-clang-g++",
+            }.get(str(self.settings.compiler))
+
+        return None
 
     @property
     def _configure_exe(self):
@@ -114,6 +141,13 @@ class QtConan(ConanFile):
             flags.append("-D_GLIBCXX_USE_CXX11_ABI=0")
         elif self.settings.get_safe("compiler.libcxx") == "libstdc++11":
             flags.append("-D_GLIBCXX_USE_CXX11_ABI=1")
+        xplatform_val = self._xplatform()
+        if xplatform_val:
+            flags.append("--platform=%s" % xplatform_val)
+        else:
+            self.output.warn("host not supported: %s %s %s %s" %
+                                (self.settings.os, self.settings.compiler,
+                                self.settings.compiler.version, self.settings.arch))
         flags.append("--opengl=desktop")
         flags.append("--c++std=c++17")
         return " ".join(flags)

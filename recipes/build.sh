@@ -89,6 +89,7 @@ function do_recipe() {
     cd $recipe_dir
 
     if [ $do_clean -eq 1 -o $do_create -eq 1 ]; then
+        sleep 1s
         rm -rf $recipe_dir/out $recipe_dir/src
     fi
 

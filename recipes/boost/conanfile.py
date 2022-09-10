@@ -42,17 +42,19 @@ class BoostConan(ConanFile):
         srcFile = os.path.join(
             tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
-        bootstrap_cmd = "{} {}".format(
-            self._bootstrap_exe, self._bootstrap_flags)
-        self.run(command=bootstrap_cmd, cwd=self.source_folder)
+        with tools.vcvars(self) if is_msvc(self) else tools.no_op():
+            bootstrap_cmd = "{} {}".format(
+                self._bootstrap_exe, self._bootstrap_flags)
+            self.run(command=bootstrap_cmd, cwd=self.source_folder)
 
     def package_id(self):
         del self.info.settings.build_type
 
     def package(self):
-        install_cmd = "{} {} install --prefix={}".format(
-            self._b2_exe, self._build_flags, self.package_folder)
-        self.run(command=install_cmd, cwd=self.source_folder)
+        with tools.vcvars(self) if is_msvc(self) else tools.no_op():
+            install_cmd = "{} {} install --prefix={}".format(
+                self._b2_exe, self._build_flags, self.package_folder)
+            self.run(command=install_cmd, cwd=self.source_folder)
 
         copy(self, "LICENSE_1_0.txt", dst=os.path.join(
             self.package_folder, "licenses"), src=self.source_folder)
