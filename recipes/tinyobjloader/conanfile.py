@@ -6,7 +6,7 @@ import os
 
 class TinyObjLoaderConan(ConanFile):
     name = "tinyobjloader"
-    version = "cci.20200228"
+    version = "v2020.02.28"
     url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/tinyobjloader/tinyobjloader"
     description = "Tiny but powerful single file wavefront obj loader"

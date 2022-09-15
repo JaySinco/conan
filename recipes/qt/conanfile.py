@@ -86,8 +86,7 @@ class QtConan(ConanFile):
 
     def _get_source(self, name):
         srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"),
-            "{}-everywhere-opensource-src-{}.tar.xz".format(name, self.version))
+            tools.get_env("JAYSINCO_SOURCE_REPO"), "{}-{}.tar.xz".format(name, self.version))
         tools.unzip(srcFile, destination=os.path.join(
             self.source_folder, name), strip_root=True)
 

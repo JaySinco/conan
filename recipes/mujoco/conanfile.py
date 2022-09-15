@@ -33,8 +33,8 @@ class MujocoConan(ConanFile):
     def requirements(self):
         self.requires("libccd/2.1@jaysinco/stable")
         self.requires("qhull/8.0.2@jaysinco/stable")
-        self.requires("lodepng/cci.20220718@jaysinco/stable")
-        self.requires("tinyobjloader/cci.20200228@jaysinco/stable")
+        self.requires("lodepng/v2022.07.18@jaysinco/stable")
+        self.requires("tinyobjloader/v2020.02.28@jaysinco/stable")
         self.requires("tinyxml2/9.0.0@jaysinco/stable")
 
     def layout(self):

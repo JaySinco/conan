@@ -1,29 +1,29 @@
 from conans import ConanFile, tools
-from conan.tools.cmake import CMakeToolchain, CMake
+from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
 from conan.tools.files import collect_libs, copy, rmdir
 import os
 
 
-class GflagsConan(ConanFile):
-    name = "gflags"
-    version = "2.2.2"
+class GlogConan(ConanFile):
+    name = "glog"
+    version = "0.6.0"
     url = "https://github.com/JaySinco/dev-setup"
-    homepage = "https://github.com/gflags/gflags"
-    description = "The gflags package contains a C++ library that implements commandline flags processing"
+    homepage = "https://github.com/google/glog/"
+    description = "Google logging library"
     license = "BSD-3-Clause"
 
     settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
-        "nothreads": [True, False],
-        "namespace": ["ANY"]
+        "with_gflags": [True, False],
+        "with_threads": [True, False],
     }
     default_options = {
         "shared": False,
         "fPIC": True,
-        "nothreads": False,
-        "namespace": "gflags",
+        "with_gflags": True,
+        "with_threads": True,
     }
 
     def config_options(self):
@@ -33,6 +33,12 @@ class GflagsConan(ConanFile):
     def configure(self):
         if self.options.shared:
             del self.options.fPIC
+        if self.options.with_gflags:
+            self.options["gflags"].shared = self.options.shared
+
+    def requirements(self):
+        if self.options.with_gflags:
+            self.requires("gflags/2.2.2@jaysinco/stable")
 
     def layout(self):
         build_folder = "out"
@@ -49,19 +55,15 @@ class GflagsConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
-        tc.variables["BUILD_STATIC_LIBS"] = not self.options.shared
-        tc.variables["BUILD_gflags_LIB"] = not self.options.nothreads
-        tc.variables["BUILD_gflags_nothreads_LIB"] = self.options.nothreads
-        tc.variables["BUILD_PACKAGING"] = False
+        tc.variables["WITH_GFLAGS"] = self.options.with_gflags
+        tc.variables["WITH_THREADS"] = self.options.with_threads
+        tc.variables["WITH_PKGCONFIG"] = True
+        tc.variables["WITH_SYMBOLIZE"] = True
+        tc.variables["WITH_UNWIND"] = True
         tc.variables["BUILD_TESTING"] = False
-        tc.variables["INSTALL_HEADERS"] = True
-        tc.variables["INSTALL_SHARED_LIBS"] = self.options.shared
-        tc.variables["INSTALL_STATIC_LIBS"] = not self.options.shared
-        tc.variables["REGISTER_BUILD_DIR"] = False
-        tc.variables["REGISTER_INSTALL_PREFIX"] = False
-        tc.variables["GFLAGS_NAMESPACE"] = self.options.namespace
         tc.generate()
+        cmake_deps = CMakeDeps(self)
+        cmake_deps.generate()
 
     def build(self):
         cmake = CMake(self)
@@ -69,7 +71,7 @@ class GflagsConan(ConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, "COPYING.txt", dst=os.path.join(
+        copy(self, "COPYING", dst=os.path.join(
             self.package_folder, "licenses"), src=self.source_folder)
         cmake = CMake(self)
         cmake.install()
@@ -77,12 +79,17 @@ class GflagsConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
-        self.cpp_info.set_property("cmake_file_name", "gflags")
-        self.cpp_info.set_property("cmake_target_name", "gflags::gflags")
-        # self.cpp_info.set_property("cmake_target_aliases", ["gflags"])
-        self.cpp_info.set_property("pkg_config_name", "gflags")
+        self.cpp_info.set_property("cmake_file_name", "glog")
+        self.cpp_info.set_property("cmake_target_name", "glog::glog")
+        self.cpp_info.set_property("cmake_target_aliases", ["glog"])
+        self.cpp_info.set_property("pkg_config_name", "libglog")
         self.cpp_info.libs = collect_libs(self, folder="lib")
         if self.settings.os == "Windows":
-            self.cpp_info.system_libs.extend(["shlwapi"])
+            self.cpp_info.system_libs.extend(["dbghelp"])
+            self.cpp_info.defines = ["GLOG_NO_ABBREVIATED_SEVERITIES"]
+            decl = "__declspec(dllimport)" if self.options.shared else ""
+            self.cpp_info.defines.append("GOOGLE_GLOG_DLL_DECL={}".format(decl))
         elif self.settings.os in ["Linux", "FreeBSD"]:
-            self.cpp_info.system_libs.extend(["pthread", "m"])
+            self.cpp_info.system_libs.extend(["pthread"])
+        if self.options.with_gflags and not self.options.shared:
+            self.cpp_info.defines.extend(["GFLAGS_DLL_DECLARE_FLAG=", "GFLAGS_DLL_DEFINE_FLAG="])

@@ -52,6 +52,7 @@ function package() {
 if [ $do_build_all -eq 1 ]; then
     echo start! \
     && package 1 gflags \
+    && package 1 glog \
     && package 1 fmt \
     && package 1 spdlog \
     && package 0 boost \
@@ -68,6 +69,8 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 tinyxml2 \
     && package 1 mujoco \
     && package 0 torch \
+    && package 1 double-conversion \
+    && package 1 bzip2 \
     && echo done!
     exit 0
 fi
