@@ -1,5 +1,4 @@
 import sys, os
-sys.path.append("..")
 from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.files import rmdir, rm, rename

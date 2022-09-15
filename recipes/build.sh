@@ -60,10 +60,13 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 git_root="$(git rev-parse --show-toplevel)"
 
 if [ $os = "linux" ]; then
-    export JAYSINCO_SOURCE_REPO=$git_root/src
+    source_repo=$git_root/src
 elif [ $os = "windows" ]; then
-    export JAYSINCO_SOURCE_REPO=$HOME/OneDrive/src
+    source_repo=$HOME/OneDrive/src
 fi
+
+export JAYSINCO_SOURCE_REPO=$source_repo
+export PYTHONPATH=$git_root/recipes
 
 conan_ref="jaysinco/stable"
 conan_profile="$git_root/profiles/$arch-$os.profile"
