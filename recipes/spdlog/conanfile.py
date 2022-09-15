@@ -1,13 +1,14 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
 from conan.tools.files import collect_libs, copy, rmdir
-import os
 
 
-class SpdlogConan(ConanFile):
+class SpdlogConan(MyConanFile):
     name = "spdlog"
     version = "1.10.0"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/gabime/spdlog"
     description = "Fast C++ logging library"
     license = "MIT"
@@ -33,19 +34,10 @@ class SpdlogConan(ConanFile):
             del self.options.fPIC
 
     def requirements(self):
-        self.requires("fmt/8.1.1@jaysinco/stable")
-
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = os.path.join(
-            self.folders.build, "generators")
+        self._requires_with_ref("fmt/8.1.1")
 
     def source(self):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
+        srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
 
     def generate(self):

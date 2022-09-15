@@ -1,13 +1,14 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
 from conan.tools.files import collect_libs, copy, rmdir
-import os
 
 
-class MujocoConan(ConanFile):
+class MujocoConan(MyConanFile):
     name = "mujoco"
     version = "2.2.2"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/deepmind/mujoco"
     description = "Multi-Joint dynamics with Contact. A general purpose physics simulator"
     license = "Apache-2.0"
@@ -31,25 +32,18 @@ class MujocoConan(ConanFile):
             del self.options.fPIC
 
     def requirements(self):
-        self.requires("libccd/2.1@jaysinco/stable")
-        self.requires("qhull/8.0.2@jaysinco/stable")
-        self.requires("lodepng/v2022.07.18@jaysinco/stable")
-        self.requires("tinyobjloader/v2020.02.28@jaysinco/stable")
-        self.requires("tinyxml2/9.0.0@jaysinco/stable")
-
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = os.path.join(
-            self.folders.build, "generators")
+        self._requires_with_ref("libccd/2.1")
+        self._requires_with_ref("qhull/8.0.2")
+        self._requires_with_ref("lodepng/v2022.07.18")
+        self._requires_with_ref("tinyobjloader/v2020.02.28")
+        self._requires_with_ref("tinyxml2/9.0.0")
 
     def source(self):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
+        srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
-        self._patch_sources()
+        self._patch_sources(self._file_dirname(__file__), [
+            "0001-fix-cmake-findorfetch-dependencies.patch",
+        ])
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -79,11 +73,3 @@ class MujocoConan(ConanFile):
         self.cpp_info.set_property("cmake_target_name", "mujoco::mujoco")
         self.cpp_info.set_property("pkg_config_name", "mujoco")
         self.cpp_info.libs = collect_libs(self, folder="lib")
-
-    def _patch_sources(self):
-        patches = [
-            "0001-fix-cmake-findorfetch-dependencies.patch"
-        ]
-        dirname = os.path.dirname(os.path.abspath(__file__))
-        for pat in patches:
-            tools.patch(self.source_folder, os.path.join(dirname, "patches", pat))

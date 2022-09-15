@@ -1,13 +1,14 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
-import os
 
 
-class Tinyxml2Conan(ConanFile):
+class Tinyxml2Conan(MyConanFile):
     name = "tinyxml2"
     version = "9.0.0"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/leethomason/tinyxml2"
     description = "Simple, small, efficient, C++ XML parser that can be easily integrated into other programs"
     license = "Zlib"
@@ -30,17 +31,8 @@ class Tinyxml2Conan(ConanFile):
         if self.options.shared:
             del self.options.fPIC
 
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = os.path.join(
-            self.folders.build, "generators")
-
     def source(self):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
+        srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
 
     def generate(self):

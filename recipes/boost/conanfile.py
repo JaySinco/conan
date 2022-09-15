@@ -1,15 +1,16 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.files import collect_libs, copy, rmdir
 from conan.tools.microsoft import msvc_runtime_flag, is_msvc
 from conan.tools.build import build_jobs
 from conan.errors import ConanException
-import os
 
 
-class BoostConan(ConanFile):
+class BoostConan(MyConanFile):
     name = "boost"
     version = "1.79.0"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://www.boost.org"
     description = "Boost provides free peer-reviewed portable C++ source libraries"
     license = "BSL-1.0"
@@ -32,15 +33,8 @@ class BoostConan(ConanFile):
         if self.options.shared:
             del self.options.fPIC
 
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
-
     def source(self):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
+        srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
         with tools.vcvars(self) if is_msvc(self) else tools.no_op():
             bootstrap_cmd = "{} {}".format(

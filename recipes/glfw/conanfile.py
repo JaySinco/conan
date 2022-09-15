@@ -1,14 +1,15 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
 from conan.tools.microsoft import is_msvc, is_msvc_static_runtime
-import os
 
 
-class GlfwConan(ConanFile):
+class GlfwConan(MyConanFile):
     name = "glfw"
     version = "3.3.7"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/glfw/glfw"
     description = "GLFW is a free, Open Source, multi-platform library for OpenGL application development"
     license = "Zlib"
@@ -31,17 +32,8 @@ class GlfwConan(ConanFile):
         if self.options.shared:
             del self.options.fPIC
 
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = os.path.join(
-            self.folders.build, "generators")
-
     def source(self):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
+        srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
 
     def generate(self):

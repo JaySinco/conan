@@ -1,14 +1,15 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.files import collect_libs, copy, rmdir
 from conan.tools.microsoft import msvc_runtime_flag, is_msvc
 from conan.tools.build import build_jobs
-import os
 
 
-class QtConan(ConanFile):
+class QtConan(MyConanFile):
     name = "qt"
     version = "5.15.3"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://download.qt.io/official_releases/qt/"
     description = "Qt is a cross-platform framework for graphical user interfaces"
     license = "LGPL-3.0"
@@ -30,12 +31,6 @@ class QtConan(ConanFile):
     def configure(self):
         if self.options.shared:
             del self.options.fPIC
-
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
 
     def source(self):
         self._get_source("qtbase")
@@ -85,8 +80,7 @@ class QtConan(ConanFile):
                     cwd=os.path.join(self.source_folder, name))
 
     def _get_source(self, name):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "{}-{}.tar.xz".format(name, self.version))
+        srcFile = self._src_abspath(f"{name}-{self.version}.tar.xz")
         tools.unzip(srcFile, destination=os.path.join(
             self.source_folder, name), strip_root=True)
 
@@ -142,11 +136,9 @@ class QtConan(ConanFile):
             flags.append("-D_GLIBCXX_USE_CXX11_ABI=1")
         xplatform_val = self._xplatform()
         if xplatform_val:
-            flags.append("--platform=%s" % xplatform_val)
+            flags.append(f"--platform={xplatform_val}")
         else:
-            self.output.warn("host not supported: %s %s %s %s" %
-                                (self.settings.os, self.settings.compiler,
-                                self.settings.compiler.version, self.settings.arch))
+            self.output.warn("host not supported!")
         flags.append("--opengl=desktop")
         flags.append("--c++std=c++17")
         return " ".join(flags)

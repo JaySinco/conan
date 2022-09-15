@@ -1,34 +1,32 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.files import rmdir, rm, rename
 from conan.tools.microsoft import is_msvc
-import os
 import glob
 import shutil
 
 
-class TorchConan(ConanFile):
+class TorchConan(MyConanFile):
     name = "torch"
     version = "1.8.2"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/pytorch/pytorch"
     description = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
     license = "BSD"
 
     settings = "os", "arch", "compiler", "build_type"
 
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
-
     def package_id(self):
         del self.info.settings.compiler
         del self.info.settings.build_type
 
     def package(self):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), self._src_file)
+        filename = "libtorch-win-shared-with-deps-{}+cu111.zip".format(self.version)
+        if self.settings.os == "Linux":
+            filename = "libtorch-cxx11-abi-shared-with-deps-{}+cpu.zip".format(self.version)
+
+        srcFile = self._src_abspath(filename)
         tools.unzip(srcFile, destination=self.package_folder, strip_root=True)
 
         if self.settings.os == "Windows":
@@ -66,10 +64,3 @@ class TorchConan(ConanFile):
             self.cpp_info.cxxflags = [
                 "/W0",
             ]
-
-    @property
-    def _src_file(self):
-        if self.settings.os == "Linux":
-            return "libtorch-cxx11-abi-shared-with-deps-{}+cpu.zip".format(self.version)
-        else:
-            return "libtorch-win-shared-with-deps-{}+cu111.zip".format(self.version)

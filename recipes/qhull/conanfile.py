@@ -1,14 +1,15 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
 from conan.tools.microsoft import is_msvc
-import os
 
 
-class QhullConan(ConanFile):
+class QhullConan(MyConanFile):
     name = "qhull"
     version = "8.0.2"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "http://www.qhull.org"
     description = "Qhull computes the convex hull, Delaunay triangulation, Voronoi diagram, halfspace intersection about a point, furthest-site Delaunay triangulation, and furthest-site Voronoi diagram"
     license = "Qhull"
@@ -33,19 +34,12 @@ class QhullConan(ConanFile):
         if self.options.shared:
             del self.options.fPIC
 
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = os.path.join(
-            self.folders.build, "generators")
-
     def source(self):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.tar.gz" % (self.name, self.version))
+        srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
-        self._patch_sources()
+        self._patch_sources(self._file_dirname(__file__), [
+            "0001-fix-cmake-minimum-required-location.patch",
+        ])
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -115,11 +109,3 @@ class QhullConan(ConanFile):
             if self.settings.build_type == "Debug":
                 name += "d"
         return name
-
-    def _patch_sources(self):
-        patches = [
-            "0001-fix-cmake-minimum-required-location.patch"
-        ]
-        dirname = os.path.dirname(os.path.abspath(__file__))
-        for pat in patches:
-            tools.patch(self.source_folder, os.path.join(dirname, "patches", pat))

@@ -1,13 +1,14 @@
+import sys, os
+sys.path.append("..")
+from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
-import os
 
 
-class TinyObjLoaderConan(ConanFile):
+class TinyObjLoaderConan(MyConanFile):
     name = "tinyobjloader"
     version = "v2020.02.28"
-    url = "https://github.com/JaySinco/dev-setup"
     homepage = "https://github.com/tinyobjloader/tinyobjloader"
     description = "Tiny but powerful single file wavefront obj loader"
     license = "MIT"
@@ -32,19 +33,12 @@ class TinyObjLoaderConan(ConanFile):
         if self.options.shared:
             del self.options.fPIC
 
-    def layout(self):
-        build_folder = "out"
-        build_type = str(self.settings.build_type)
-        self.folders.source = "src"
-        self.folders.build = os.path.join(build_folder, build_type)
-        self.folders.generators = os.path.join(
-            self.folders.build, "generators")
-
     def source(self):
-        srcFile = os.path.join(
-            tools.get_env("JAYSINCO_SOURCE_REPO"), "%s-%s.zip" % (self.name, self.version))
+        srcFile = self._src_abspath(f"{self.name}-{self.version}.zip")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
-        self._patch_sources()
+        self._patch_sources(self._file_dirname(__file__), [
+            "0001-fix-cmake-minimum-required-location.patch",
+        ])
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -76,11 +70,3 @@ class TinyObjLoaderConan(ConanFile):
         self.cpp_info.libs = [name]
         if self.options.double:
             self.cpp_info.defines.append("TINYOBJLOADER_USE_DOUBLE")
-
-    def _patch_sources(self):
-        patches = [
-            "0001-fix-cmake-minimum-required-location.patch"
-        ]
-        dirname = os.path.dirname(os.path.abspath(__file__))
-        for pat in patches:
-            tools.patch(self.source_folder, os.path.join(dirname, "patches", pat))
