@@ -87,6 +87,9 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 zlib \
     && package 0 openssl \
     && package 1 libevent \
+    && package 1 zstd \
+    && package 1 snappy \
+    && package 1 lz4 \
     && echo done!
     exit 0
 fi
