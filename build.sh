@@ -85,6 +85,8 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 double-conversion \
     && package 1 bzip2 \
     && package 1 zlib \
+    && package 0 openssl \
+    && package 1 libevent \
     && echo done!
     exit 0
 fi
