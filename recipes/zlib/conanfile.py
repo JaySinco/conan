@@ -2,7 +2,7 @@ import sys, os
 from myconanfile import MyConanFile
 from conans import ConanFile, tools
 from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
-from conan.tools.files import collect_libs, copy, rmdir
+from conan.tools.files import collect_libs, copy, rmdir, rm
 
 
 class ZlibConan(MyConanFile):
@@ -33,6 +33,9 @@ class ZlibConan(MyConanFile):
     def source(self):
         srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
+        self._patch_sources(self._dirname(__file__), [
+            "0001-fix-cmake-install-error.patch",
+        ])
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -48,9 +51,13 @@ class ZlibConan(MyConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, "zlib.h", dst=os.path.join(self.package_folder, "include"), src=self.source_folder)
-        copy(self, "zconf.h", dst=os.path.join(self.package_folder, "include"), src=self.build_folder)
-        copy(self, "zlibstatic.lib", dst=os.path.join(self.package_folder, "lib"), src=self.build_folder)
+        cmake = CMake(self)
+        cmake.install()
+        if self.options.shared:
+            rm(self, "zlibstatic.lib", os.path.join(self.package_folder, "lib"))
+        else:
+            rm(self, "zlib.lib", os.path.join(self.package_folder, "lib"))
+            rmdir(self, os.path.join(self.package_folder, "bin"))
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "ZLIB")
