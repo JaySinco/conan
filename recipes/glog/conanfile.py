@@ -77,7 +77,7 @@ class GlogConan(MyConanFile):
         self.cpp_info.libs = collect_libs(self, folder="lib")
         if self.settings.os == "Windows":
             self.cpp_info.system_libs.extend(["dbghelp"])
-            self.cpp_info.defines = ["GLOG_NO_ABBREVIATED_SEVERITIES"]
+            self.cpp_info.defines.append("GLOG_NO_ABBREVIATED_SEVERITIES")
             decl = "__declspec(dllimport)" if self.options.shared else ""
             self.cpp_info.defines.append("GOOGLE_GLOG_DLL_DECL={}".format(decl))
         elif self.settings.os in ["Linux", "FreeBSD"]:

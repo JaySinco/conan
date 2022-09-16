@@ -50,9 +50,6 @@ class Bzip2Conan(MyConanFile):
         cmake.configure()
         cmake.build()
 
-    def package_id(self):
-        del self.info.options.with_fmt_alias
-
     def package(self):
         copy(self, "LICENSE", dst=os.path.join(
             self.package_folder, "licenses"), src=self.source_folder)
