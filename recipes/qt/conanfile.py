@@ -31,6 +31,10 @@ class QtConan(MyConanFile):
         if self.options.shared:
             del self.options.fPIC
 
+    def build_requirements(self):
+        if self._build_on_windows():
+            self.build_requires(self._ref_pkg("jom/1.1.3"))
+
     def source(self):
         self._get_source("qtbase")
         self._get_source("qttools")

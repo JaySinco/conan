@@ -36,7 +36,7 @@ class Bzip2Conan(MyConanFile):
     def source(self):
         srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
-        copy(self, "CMakeLists.txt", dst=self.source_folder, src=self._file_dirname(__file__))
+        copy(self, "CMakeLists.txt", dst=self.source_folder, src=self._dirname(__file__))
 
     def generate(self):
         tc = CMakeToolchain(self)

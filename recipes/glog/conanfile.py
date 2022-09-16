@@ -38,7 +38,7 @@ class GlogConan(MyConanFile):
 
     def requirements(self):
         if self.options.with_gflags:
-            self._requires_with_ref("gflags/2.2.2")
+            self.requires(self._ref_pkg("gflags/2.2.2"))
 
     def source(self):
         srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")

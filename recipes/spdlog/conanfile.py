@@ -33,7 +33,7 @@ class SpdlogConan(MyConanFile):
             del self.options.fPIC
 
     def requirements(self):
-        self._requires_with_ref("fmt/8.1.1")
+        self.requires(self._ref_pkg("fmt/8.1.1"))
 
     def source(self):
         srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")

@@ -31,16 +31,16 @@ class MujocoConan(MyConanFile):
             del self.options.fPIC
 
     def requirements(self):
-        self._requires_with_ref("libccd/2.1")
-        self._requires_with_ref("qhull/8.0.2")
-        self._requires_with_ref("lodepng/v2022.07.18")
-        self._requires_with_ref("tinyobjloader/v2020.02.28")
-        self._requires_with_ref("tinyxml2/9.0.0")
+        self.requires(self._ref_pkg("libccd/2.1"))
+        self.requires(self._ref_pkg("qhull/8.0.2"))
+        self.requires(self._ref_pkg("lodepng/v2022.07.18"))
+        self.requires(self._ref_pkg("tinyobjloader/v2020.02.28"))
+        self.requires(self._ref_pkg("tinyxml2/9.0.0"))
 
     def source(self):
         srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
-        self._patch_sources(self._file_dirname(__file__), [
+        self._patch_sources(self._dirname(__file__), [
             "0001-fix-cmake-findorfetch-dependencies.patch",
         ])
 

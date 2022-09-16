@@ -36,7 +36,7 @@ class QhullConan(MyConanFile):
     def source(self):
         srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
-        self._patch_sources(self._file_dirname(__file__), [
+        self._patch_sources(self._dirname(__file__), [
             "0001-fix-cmake-minimum-required-location.patch",
         ])
 

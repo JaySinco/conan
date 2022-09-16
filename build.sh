@@ -36,6 +36,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+case "$OSTYPE" in
+    linux*)   os=linux ;;
+    msys*)    os=windows ;;
+esac
+
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 git_root="$(git rev-parse --show-toplevel)"
 docker_image_tag=build:v1
@@ -49,8 +54,16 @@ function package() {
     fi
 }
 
+function package_tools() {
+    if [ $os = "windows" ]; then
+        package 0 jom \
+        && package 0 nasm \
+        && package 0 strawberryperl
+    fi
+}
+
 if [ $do_build_all -eq 1 ]; then
-    echo start! \
+    package_tools \
     && package 1 gflags \
     && package 1 glog \
     && package 1 fmt \
