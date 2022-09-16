@@ -128,7 +128,7 @@ class QtConan(MyConanFile):
             if is_msvc(self) and "MT" in msvc_runtime_flag(self):
                 flags.append("-static-runtime")
         else:
-            flags.append(0, "-shared")
+            flags.append("-shared")
         if self.settings.build_type == "Debug":
             flags.append("-debug")
         else:

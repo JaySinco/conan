@@ -21,7 +21,7 @@ class OpenSSLConan(MyConanFile):
         "no_threads": [True, False],
     }
     default_options = {
-        "shared": True,
+        "shared": False,
         "fPIC": True,
         "no_threads": False,
     }
