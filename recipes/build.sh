@@ -73,8 +73,8 @@ conan_profile="$git_root/profiles/$arch-$os.profile"
 build_type=Release
 
 if [ $build_debug -eq 1 ]; then
-    if [ $do_install -ne 1 -a $do_create -ne 1 -a $do_export_package -ne 1 ]; then
-        echo "flag '-d' must be used in conan install/package context" && exit 1
+    if [ $do_install -ne 1 -a $do_create -ne 1 -a $do_build -ne 1 -a $do_export_package -ne 1 ]; then
+        echo "wrong conan context for flag '-d'" && exit 1
     fi
     build_type=Debug
 fi

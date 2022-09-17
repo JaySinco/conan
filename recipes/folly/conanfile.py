@@ -63,6 +63,7 @@ class FollyConan(MyConanFile):
         tools.unzip(srcFile, destination=self.source_folder, strip_root=False)
         self._patch_sources(self._dirname(__file__), [
             "0001-fix-windows-minmax.patch",
+            "0002-disable-gflags-namespace-check.patch",
         ])
 
     def generate(self):

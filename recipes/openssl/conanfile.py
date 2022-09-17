@@ -71,7 +71,7 @@ class OpenSSLConan(MyConanFile):
         self.cpp_info.components["ssl"].set_property("cmake_target_name", "OpenSSL::SSL")
         self.cpp_info.components["ssl"].set_property("pkg_config_name", "libssl")
         if is_msvc(self):
-            libsuffix = "d" if self.settings.build_type == "Debug" else ""
+            libsuffix = "" if self.settings.build_type == "Debug" else ""
             self.cpp_info.components["ssl"].libs = ["libssl" + libsuffix]
             self.cpp_info.components["crypto"].libs = ["libcrypto" + libsuffix]
         else:

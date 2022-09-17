@@ -63,7 +63,8 @@ function package_tools() {
 }
 
 if [ $do_build_all -eq 1 ]; then
-    package_tools \
+    echo start! \
+    && package_tools \
     && package 1 gflags \
     && package 1 glog \
     && package 1 fmt \
