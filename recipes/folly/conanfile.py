@@ -64,12 +64,12 @@ class FollyConan(MyConanFile):
         self._patch_sources(self._dirname(__file__), [
             "0001-fix-windows-minmax.patch",
             "0002-disable-gflags-namespace-check.patch",
+            "0003-cmake-change-boost-find-mode.patch",
         ])
 
     def generate(self):
         tc = CMakeToolchain(self)
         tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0077"] = "NEW"
-        tc.variables["Boost_NO_BOOST_CMAKE"] = True
         tc.variables["FOLLY_HAVE_UNALIGNED_ACCESS_EXITCODE"] = "0"
         tc.variables["FOLLY_HAVE_UNALIGNED_ACCESS_EXITCODE__TRYRUN_OUTPUT"] = ""
         tc.variables["FOLLY_HAVE_LINUX_VDSO_EXITCODE"] = "0"
@@ -86,7 +86,6 @@ class FollyConan(MyConanFile):
             tc.variables["MSVC_LANGUAGE_VERSION"] = cxx_std_value
             tc.variables["MSVC_ENABLE_ALL_WARNINGS"] = False
             tc.variables["MSVC_USE_STATIC_RUNTIME"] = "MT" in msvc_runtime_flag(self)
-        tc.variables["CMAKE_PREFIX_PATH"] = self._cmake_path()
         tc.generate()
         cmake_deps = CMakeDeps(self)
         cmake_deps.generate()
@@ -110,6 +109,7 @@ class FollyConan(MyConanFile):
         self.cpp_info.set_property("pkg_config_name", "libfolly")
         self.cpp_info.libs = collect_libs(self, folder="lib")
         self.cpp_info.requires = [
+            "boost::boost",
             "bzip2::bzip2",
             "double-conversion::double-conversion",
             "gflags::gflags",
@@ -132,14 +132,3 @@ class FollyConan(MyConanFile):
             # self.cpp_info.requires.extend(["libiberty::libiberty", "libunwind::libunwind"])
             # self.cpp_info.defines.extend(["FOLLY_HAVE_ELF", "FOLLY_HAVE_DWARF"])
             self.cpp_info.system_libs.extend(["pthread", "dl", "rt", "atomic"])
-
-    def _cmake_path(self):
-        prefix_path = []
-        cmake_dir = {
-            "boost" : "lib/cmake",
-        }
-        for pkg in cmake_dir:
-            prefix_path.append(self._normalize_path(
-                os.path.join(self.deps_cpp_info[pkg].cpp_info.rootpath, cmake_dir[pkg])))
-
-        return "%s;${CMAKE_PREFIX_PATH}" % (";".join(prefix_path))

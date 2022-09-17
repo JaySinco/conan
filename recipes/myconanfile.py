@@ -7,7 +7,7 @@ class MyConanFile(ConanFile):
     url = "https://github.com/JaySinco/dev-setup"
 
     def export(self):
-        self._export_myconanfile()
+        copy(self, "myconanfile.py", dst=self.export_folder, src=self._dirname(__file__))
 
     def layout(self):
         build_folder = "out"
@@ -29,9 +29,6 @@ class MyConanFile(ConanFile):
     def _patch_sources(self, dirname: str, patches: List[str]):
         for pat in patches:
             tools.patch(self.source_folder, os.path.join(dirname, "patches", pat))
-
-    def _export_myconanfile(self):
-        copy(self, "myconanfile.py", dst=self.export_folder, src=self._dirname(__file__))
 
     def _build_on_windows(self):
         settings_build = getattr(self, "settings_build", self.settings)
