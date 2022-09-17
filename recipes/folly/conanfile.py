@@ -69,6 +69,7 @@ class FollyConan(MyConanFile):
     def generate(self):
         tc = CMakeToolchain(self)
         tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0077"] = "NEW"
+        tc.variables["Boost_NO_BOOST_CMAKE"] = True
         tc.variables["FOLLY_HAVE_UNALIGNED_ACCESS_EXITCODE"] = "0"
         tc.variables["FOLLY_HAVE_UNALIGNED_ACCESS_EXITCODE__TRYRUN_OUTPUT"] = ""
         tc.variables["FOLLY_HAVE_LINUX_VDSO_EXITCODE"] = "0"
