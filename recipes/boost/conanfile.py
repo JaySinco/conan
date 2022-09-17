@@ -194,7 +194,7 @@ class BoostConan(MyConanFile):
 
         non_used = all_detected_libraries.difference(all_expected_libraries)
         if non_used:
-            raise ConanException(f"These libraries were built, but were not used in any boost module: {non_used}")
+            self.output.warn(f"These libraries were built, but were not used in any boost module: {non_used}")
 
         non_built = all_expected_libraries.difference(all_detected_libraries)
         if non_built:
