@@ -146,15 +146,17 @@ class BoostConan(MyConanFile):
         def filter_transform_module_libraries(names):
             libs = []
             for name in names:
-                if name in ("boost_stacktrace_windbg", "boost_stacktrace_windbg_cached") and self.settings.os != "Windows":
+                if name in ("boost_graph_parallel", "boost_mpi", "boost_mpi_python"):
                     continue
-                if name in ("boost_stacktrace_addr2line", "boost_stacktrace_backtrace", "boost_stacktrace_basic",) and self.settings.os == "Windows":
+                if name in ("boost_stacktrace_windbg", "boost_stacktrace_windbg_cached", "boost_stacktrace_backtrace") and self.settings.os == "Linux":
+                    continue
+                if name in ("boost_stacktrace_addr2line", "boost_stacktrace_backtrace", "boost_stacktrace_basic") and self.settings.os == "Windows":
                     continue
                 if "_numa" in name:
                     continue
                 if "_numpy" in name:
                     continue
-                if name in ("boost_graph_parallel", "boost_mpi", "boost_mpi_python"):
+                if "_python" in name:
                     continue
                 new_name = add_libprefix(name.format(**libformatdata)) + libsuffix
                 libs.append(new_name)
