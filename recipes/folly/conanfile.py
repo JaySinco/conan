@@ -130,7 +130,7 @@ class FollyConan(MyConanFile):
         elif self.settings.os == "Linux":
             # self.cpp_info.requires.extend(["libiberty::libiberty", "libunwind::libunwind"])
             # self.cpp_info.defines.extend(["FOLLY_HAVE_ELF", "FOLLY_HAVE_DWARF"])
-            self.cpp_info.system_libs.extend(["pthread", "dl", "rt"])
+            self.cpp_info.system_libs.extend(["pthread", "dl", "rt", "atomic"])
 
     def _cmake_path(self):
         prefix_path = []
