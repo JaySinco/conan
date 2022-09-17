@@ -57,6 +57,7 @@ class ZlibConan(MyConanFile):
             rm(self, "zlibstatic.lib", os.path.join(self.package_folder, "lib"))
         else:
             rm(self, "zlib.lib", os.path.join(self.package_folder, "lib"))
+            rm(self, "*.so*", os.path.join(self.package_folder, "lib"))
             rmdir(self, os.path.join(self.package_folder, "bin"))
 
     def package_info(self):
