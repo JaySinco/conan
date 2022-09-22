@@ -36,18 +36,20 @@ class MujocoConan(MyConanFile):
         self.requires(self._ref_pkg("lodepng/v2022.07.18"))
         self.requires(self._ref_pkg("tinyobjloader/v2020.02.28"))
         self.requires(self._ref_pkg("tinyxml2/9.0.0"))
+        self.requires(self._ref_pkg("glfw/3.3.7"))
 
     def source(self):
         srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
         self._patch_sources(self._dirname(__file__), [
             "0001-fix-cmake-findorfetch-dependencies.patch",
+            "0002-fix-simulate-findorfetch-glfw.patch",
         ])
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["MUJOCO_BUILD_EXAMPLES"] = False
-        tc.variables["MUJOCO_BUILD_SIMULATE"] = False
+        tc.variables["MUJOCO_BUILD_EXAMPLES"] = True
+        tc.variables["MUJOCO_BUILD_SIMULATE"] = True
         tc.variables["MUJOCO_BUILD_TESTS"] = False
         tc.variables["MUJOCO_TEST_PYTHON_UTIL"] = False
         tc.generate()
