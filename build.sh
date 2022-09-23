@@ -92,6 +92,7 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 snappy \
     && package 1 lz4 \
     && package 1 folly \
+    && package 0 argparse \
     && echo done!
     exit 0
 fi
