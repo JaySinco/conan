@@ -9,6 +9,7 @@ do_vmware=0
 do_build_docker=0
 do_run_docker=0
 do_list_ext=0
+do_update_repo=0
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -24,6 +25,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -k   build docker"
             echo "  -r   run docker"
             echo "  -l   list vscode extensions"
+            echo "  -p   update all repo"
             echo "  -h   print command line options"
             echo
             exit 0
@@ -35,6 +37,7 @@ while [[ $# -gt 0 ]]; do
         -k) do_build_docker=1 && shift ;;
         -r) do_run_docker=1 && shift ;;
         -l) do_list_ext=1 && shift ;;
+        -p) do_update_repo=1 && shift ;;
         -*) echo "Unknown option: $1" && exit 1 ;;
     esac
 done
@@ -150,5 +153,25 @@ fi
 if [ $do_list_ext -eq 1 ]; then
     code --list-extensions | jq -R -s '{recommendations:split("\n")[:-1]}' \
         --indent 4 > $git_root/.vscode/extensions.json
+    exit 0
+fi
+
+function update_repo() {
+    echo "** UPDATE $1" \
+        && cd $1 \
+        && git pull
+}
+
+if [ $do_update_repo -eq 1 ]; then
+    if [ $os = "windows" ]; then
+        update_repo $git_root \
+        && update_repo $git_root/../Prototyping \
+        && update_repo $APPDATA/Code/User \
+        && update_repo $APPDATA/alacritty
+    else
+        update_repo $git_root \
+        && update_repo $git_root/../Prototyping \
+        && update_repo $HOME/.config/Code/User
+    fi
     exit 0
 fi
