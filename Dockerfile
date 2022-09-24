@@ -107,7 +107,7 @@ COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
 RUN cd /tmp \
     && sudo tar zxf nvim-0.7.0-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
     && mkdir -p /home/jaysinco/apps/lua-language-server \
-    && tar zxf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
+    && sudo tar zxf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
     && sudo rm -rf /tmp/*
 
 # config
