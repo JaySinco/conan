@@ -5,6 +5,7 @@ set -e
 do_build_all=0
 do_mount=0
 do_unmount=0
+do_vmware=0
 do_build_docker=0
 do_run_docker=0
 do_list_ext=0
@@ -17,8 +18,9 @@ while [[ $# -gt 0 ]]; do
             echo
             echo "Options:"
             echo "  -a   build all targets"
-            echo "  -m   mount vbox share"
-            echo "  -u   unmount vbox share"
+            echo "  -m   mount share [default: vbox]"
+            echo "  -u   unmount share [default: vbox]"
+            echo "  -v   u/mount vmware"
             echo "  -k   build docker"
             echo "  -r   run docker"
             echo "  -l   list vscode extensions"
@@ -29,6 +31,7 @@ while [[ $# -gt 0 ]]; do
         -a) do_build_all=1 && shift ;;
         -m) do_mount=1 && shift ;;
         -u) do_unmount=1 && shift ;;
+        -v) do_vmware=1 && shift ;;
         -k) do_build_docker=1 && shift ;;
         -r) do_run_docker=1 && shift ;;
         -l) do_list_ext=1 && shift ;;
@@ -99,13 +102,22 @@ fi
 
 if [ $do_mount -eq 1 ]; then
     mkdir -p $git_root/src
-    sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
-        share $git_root/src
+    if [ $do_vmware -eq 0 ]; then
+        sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
+            share $git_root/src
+    else
+        vmhgfs-fuse -o ro,uid=$(id -u),gid=$(id -g) \
+            .host:/share $git_root/src
+    fi
     exit 0
 fi
 
 if [ $do_unmount -eq 1 ]; then
-    sudo umount -a -t vboxsf
+    if [ $do_vmware -eq 0 ]; then
+        sudo umount -a -t vboxsf
+    else
+        sudo umount $git_root/src
+    fi
     exit 0
 fi
 
