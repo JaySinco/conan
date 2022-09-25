@@ -9,6 +9,7 @@ do_vmware=0
 do_build_docker=0
 do_run_docker=0
 do_list_ext=0
+do_install_ext=0
 do_clone_repo=0
 do_update_repo=0
 
@@ -26,6 +27,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -k   build docker"
             echo "  -r   run docker"
             echo "  -l   list vscode extensions"
+            echo "  -i   install vscode extensions"
             echo "  -n   clone all repo"
             echo "  -p   update all repo"
             echo "  -h   print command line options"
@@ -39,6 +41,7 @@ while [[ $# -gt 0 ]]; do
         -k) do_build_docker=1 && shift ;;
         -r) do_run_docker=1 && shift ;;
         -l) do_list_ext=1 && shift ;;
+        -i) do_install_ext=1 && shift ;;
         -n) do_clone_repo=1 && shift ;;
         -p) do_update_repo=1 && shift ;;
         -*) echo "Unknown option: $1" && exit 1 ;;
@@ -160,6 +163,13 @@ fi
 if [ $do_list_ext -eq 1 ]; then
     code --list-extensions | jq -R -s '{recommendations:split("\n")[:-1]}' \
         --indent 4 > $git_root/.vscode/extensions.json
+    exit 0
+fi
+
+if [ $do_install_ext -eq 1 ]; then
+    for ext in $(jq -r '.recommendations[]' < $git_root/.vscode/extensions.json); do
+        code --install-extension $ext
+    done
     exit 0
 fi
 
