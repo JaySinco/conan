@@ -168,7 +168,7 @@ fi
 
 if [ $do_install_ext -eq 1 ]; then
     for ext in $(jq -r '.recommendations[]' < $git_root/.vscode/extensions.json); do
-        code --install-extension $ext
+        code --install-extension `echo $ext | sed 's/\r$//'`
     done
     exit 0
 fi
