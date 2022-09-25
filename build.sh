@@ -9,6 +9,7 @@ do_vmware=0
 do_build_docker=0
 do_run_docker=0
 do_list_ext=0
+do_clone_repo=0
 do_update_repo=0
 
 while [[ $# -gt 0 ]]; do
@@ -25,6 +26,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -k   build docker"
             echo "  -r   run docker"
             echo "  -l   list vscode extensions"
+            echo "  -n   clone all repo"
             echo "  -p   update all repo"
             echo "  -h   print command line options"
             echo
@@ -37,6 +39,7 @@ while [[ $# -gt 0 ]]; do
         -k) do_build_docker=1 && shift ;;
         -r) do_run_docker=1 && shift ;;
         -l) do_list_ext=1 && shift ;;
+        -n) do_clone_repo=1 && shift ;;
         -p) do_update_repo=1 && shift ;;
         -*) echo "Unknown option: $1" && exit 1 ;;
     esac
@@ -157,6 +160,30 @@ fi
 if [ $do_list_ext -eq 1 ]; then
     code --list-extensions | jq -R -s '{recommendations:split("\n")[:-1]}' \
         --indent 4 > $git_root/.vscode/extensions.json
+    exit 0
+fi
+
+function clone_repo() {
+    if [ ! -d $1/.git ]; then
+        echo "** CLONE $2 -b $3" \
+        && mkdir -p $1 \
+        && cd $1 \
+        && git init \
+        && git remote add origin $2 \
+        && git fetch \
+        && git checkout origin/$3 -b $3
+    fi
+}
+
+if [ $do_clone_repo -eq 1 ]; then
+    if [ $os = "windows" ]; then
+        clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
+        && clone_repo $APPDATA/Code/User git@github.com:JaySinco/vscode.git master \
+        && clone_repo $APPDATA/alacritty git@github.com:JaySinco/alacritty.git master
+    else
+        clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
+        && clone_repo $HOME/.config/Code/User git@github.com:JaySinco/vscode.git linux
+    fi
     exit 0
 fi
 
