@@ -94,6 +94,7 @@ USER jaysinco
 # -----------------
 RUN sudo apt-get update -y \
     && sudo apt-get install -y xclip jq ripgrep \
+    && sudo apt-get install -y libnspr4 libnss3 libsecret-1-0 xdg-utils \
     && sudo npm install -g typescript-language-server typescript pyright \
     && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
     && pip3 install --no-warn-script-location conan
@@ -102,25 +103,30 @@ RUN sudo apt-get update -y \
 # -----------------
 COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
      src/lua-language-server-3.2.5-linux-x64.tar.gz \
+     src/code_1.71.2-1663191218_amd64.deb \
+     src/FiraMono.zip \
      /tmp/
-     
+
 RUN cd /tmp \
     && sudo tar zxf nvim-0.7.0-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
     && mkdir -p /home/jaysinco/apps/lua-language-server \
     && sudo tar zxf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
+    && sudo dpkg -i code_1.71.2-1663191218_amd64.deb \
+    && mkdir -p /home/jaysinco/.local/share \
+    && sudo unzip FiraMono.zip -d /home/jaysinco/.local/share/fonts \
     && sudo rm -rf /tmp/*
 
 # config
 # -----------------
-ENV XDG_RUNTIME_DIR=/tmp/xdg-runtime-root \
+ENV XDG_RUNTIME_DIR=/home/jaysinco/xdg-runtime-root \
     NO_AT_BRIDGE=1 \
     PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}" \
-    LD_LIBRARY_PATH="/home/jaysinco/.conan/data/torch/1.8.2/jaysinco/stable/package/4db1be536558d833e52e862fd84d64d75c2b3656/lib"
+    LD_LIBRARY_PATH="/home/jaysinco/.conan/data/torch/1.8.2/jaysinco/stable/package/4db1be536558d833e52e862fd84d64d75c2b3656/lib" \
+    code='code --no-sandbox'
 
-RUN mkdir -p /home/jaysinco/.local/share \
+RUN mkdir -p $XDG_RUNTIME_DIR \
     && git config --global user.name jaysinco \
     && git config --global user.email jaysinco@163.com
 
 WORKDIR /home/jaysinco/workspace
 ENTRYPOINT ["/bin/bash"]
-

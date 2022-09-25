@@ -137,6 +137,8 @@ if [ $do_run_docker -eq 1 ]; then
         $HOME/.ssh \
         $HOME/.config/nvim \
         $HOME/.local/share/nvim \
+        $HOME/.config/Code \
+        $HOME/.vscode \
         $HOME/.conan
     docker run -it --rm \
         -e DISPLAY \
@@ -144,6 +146,8 @@ if [ $do_run_docker -eq 1 ]; then
         -v $HOME/.ssh:/home/jaysinco/.ssh:ro \
         -v $HOME/.config/nvim:/home/jaysinco/.config/nvim:rw \
         -v $HOME/.local/share/nvim:/home/jaysinco/.local/share/nvim:rw \
+        -v $HOME/.config/Code:/home/jaysinco/.config/Code:rw \
+        -v $HOME/.vscode:/home/jaysinco/.vscode:rw \
         -v $HOME/.conan:/home/jaysinco/.conan:rw \
         -v $git_root:/home/jaysinco/workspace:rw \
         $docker_image_tag
