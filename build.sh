@@ -12,6 +12,7 @@ do_list_ext=0
 do_install_ext=0
 do_clone_repo=0
 do_update_repo=0
+do_status_repo=0
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -30,6 +31,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -i   install vscode extensions"
             echo "  -n   clone all repo"
             echo "  -p   update all repo"
+            echo "  -s   list all repo status"
             echo "  -h   print command line options"
             echo
             exit 0
@@ -44,6 +46,7 @@ while [[ $# -gt 0 ]]; do
         -i) do_install_ext=1 && shift ;;
         -n) do_clone_repo=1 && shift ;;
         -p) do_update_repo=1 && shift ;;
+        -s) do_status_repo=1 && shift ;;
         -*) echo "Unknown option: $1" && exit 1 ;;
     esac
 done
@@ -228,6 +231,27 @@ if [ $do_update_repo -eq 1 ]; then
         && update_repo $git_root/../Prototyping \
         && update_repo $HOME/.config/Code/User \
         && update_repo $HOME/.config/nvim
+    fi
+    exit 0
+fi
+
+function status_repo() {
+    echo "** STATUS $1" \
+        && cd $1 \
+        && git status
+}
+
+if [ $do_status_repo -eq 1 ]; then
+    if [ $os = "windows" ]; then
+        status_repo $git_root \
+        && status_repo $git_root/../Prototyping \
+        && status_repo $APPDATA/Code/User \
+        && status_repo $APPDATA/alacritty
+    else
+        status_repo $git_root \
+        && status_repo $git_root/../Prototyping \
+        && status_repo $HOME/.config/Code/User \
+        && status_repo $HOME/.config/nvim
     fi
     exit 0
 fi
