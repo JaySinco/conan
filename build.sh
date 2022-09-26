@@ -118,6 +118,7 @@ if [ $do_mount -eq 1 ]; then
         sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
             share $git_root/src
     else
+        # apt install open-vm-tools open-vm-tools-desktop
         vmhgfs-fuse -o ro,uid=$(id -u),gid=$(id -g) \
             .host:/share $git_root/src
     fi
