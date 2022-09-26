@@ -147,7 +147,11 @@ if [ $do_run_docker -eq 1 ]; then
         $HOME/.vscode \
         $HOME/.conan
     docker run -it --rm \
-        -e DISPLAY \
+        --security-opt seccomp=unconfined \
+        --shm-size=1G \
+        -e DISPLAY=$DISPLAY \
+        -e LOCAL_UID=$(id -u) \
+        -e LOCAL_GID=$(id -g) \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $HOME/.ssh:/home/jaysinco/.ssh:ro \
         -v $HOME/.config/nvim:/home/jaysinco/.config/nvim:rw \
@@ -155,7 +159,8 @@ if [ $do_run_docker -eq 1 ]; then
         -v $HOME/.config/Code:/home/jaysinco/.config/Code:rw \
         -v $HOME/.vscode:/home/jaysinco/.vscode:rw \
         -v $HOME/.conan:/home/jaysinco/.conan:rw \
-        -v $git_root:/home/jaysinco/workspace:rw \
+        -v $git_root/../dev-setup:/home/jaysinco/dev-setup:rw \
+        -v $git_root/../Prototyping:/home/jaysinco/Prototyping:rw \
         $docker_image_tag
     exit 0
 fi

@@ -121,12 +121,11 @@ RUN cd /tmp \
 ENV XDG_RUNTIME_DIR=/home/jaysinco/xdg-runtime-root \
     NO_AT_BRIDGE=1 \
     PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}" \
-    LD_LIBRARY_PATH="/home/jaysinco/.conan/data/torch/1.8.2/jaysinco/stable/package/4db1be536558d833e52e862fd84d64d75c2b3656/lib" \
-    code='code --no-sandbox'
+    LD_LIBRARY_PATH="/home/jaysinco/.conan/data/torch/1.8.2/jaysinco/stable/package/4db1be536558d833e52e862fd84d64d75c2b3656/lib"
 
 RUN mkdir -p $XDG_RUNTIME_DIR \
     && git config --global user.name jaysinco \
     && git config --global user.email jaysinco@163.com
 
-WORKDIR /home/jaysinco/workspace
+WORKDIR /home/jaysinco
 ENTRYPOINT ["/bin/bash"]
