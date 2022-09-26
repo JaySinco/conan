@@ -197,6 +197,10 @@ if [ $do_clone_repo -eq 1 ]; then
         && if [ ! -d $HOME/.local/share/nvim/site ]; then
             mkdir -p $HOME/.local/share/nvim/ \
             && unzip $git_root/src/nvim-data-site-v2022.09.24.zip -d $HOME/.local/share/nvim/
+        fi \
+        && if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
+            mkdir -p $HOME/.local/share/fonts \
+            && unzip $git_root/src/FiraMono.zip -d $HOME/.local/share/fonts
         fi
     fi
     exit 0
