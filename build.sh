@@ -192,7 +192,12 @@ if [ $do_clone_repo -eq 1 ]; then
         && clone_repo $APPDATA/alacritty git@github.com:JaySinco/alacritty.git master
     else
         clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
-        && clone_repo $HOME/.config/Code/User git@github.com:JaySinco/vscode.git linux
+        && clone_repo $HOME/.config/Code/User git@github.com:JaySinco/vscode.git linux \
+        && clone_repo $HOME/.config/nvim/ git@github.com:JaySinco/nvim.git master \
+        && if [ ! -d $HOME/.local/share/nvim/site ]; then
+            mkdir -p $HOME/.local/share/nvim/ \
+            && unzip $git_root/src/nvim-data-site-v2022.09.24.zip -d $HOME/.local/share/nvim/
+        fi
     fi
     exit 0
 fi
@@ -212,7 +217,8 @@ if [ $do_update_repo -eq 1 ]; then
     else
         update_repo $git_root \
         && update_repo $git_root/../Prototyping \
-        && update_repo $HOME/.config/Code/User
+        && update_repo $HOME/.config/Code/User \
+        && update_repo $HOME/.config/nvim
     fi
     exit 0
 fi
