@@ -63,9 +63,9 @@ docker_image_tag=build:v1
 function package() {
     local build_debug=$1
     local name=$2
-    $git_root/recipes/build.sh $name -r && \
+    $git_root/../dev-setup/recipes/build.sh $name -r && \
     if [ $build_debug -eq 1 ]; then
-        $git_root/recipes/build.sh $name -r -d
+        $git_root/../dev-setup/recipes/build.sh $name -r -d
     fi
 }
 
@@ -114,14 +114,14 @@ if [ $do_build_all -eq 1 ]; then
 fi
 
 if [ $do_mount -eq 1 ]; then
-    mkdir -p $git_root/src
+    mkdir -p $git_root/../dev-setup/src
     if [ $do_vmware -eq 0 ]; then
         sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
-            share $git_root/src
+            share $git_root/../dev-setup/src
     else
         # apt install open-vm-tools open-vm-tools-desktop
         vmhgfs-fuse -o ro,uid=$(id -u),gid=$(id -g) \
-            .host:/share $git_root/src
+            .host:/share $git_root/../dev-setup/src
     fi
     exit 0
 fi
@@ -130,16 +130,16 @@ if [ $do_unmount -eq 1 ]; then
     if [ $do_vmware -eq 0 ]; then
         sudo umount -a -t vboxsf
     else
-        sudo umount $git_root/src
+        sudo umount $git_root/../dev-setup/src
     fi
     exit 0
 fi
 
 if [ $do_build_docker -eq 1 ]; then
     docker build \
-        -f $git_root/Dockerfile \
+        -f $git_root/../dev-setup/Dockerfile \
         -t $docker_image_tag \
-        $git_root
+        $git_root/../dev-setup
     exit 0
 fi
 
@@ -172,12 +172,12 @@ fi
 
 if [ $do_list_ext -eq 1 ]; then
     code --list-extensions | jq -R -s '{recommendations:split("\n")[:-1]}' \
-        --indent 4 > $git_root/.vscode/extensions.json
+        --indent 4 > $git_root/../dev-setup/.vscode/extensions.json
     exit 0
 fi
 
 if [ $do_install_ext -eq 1 ]; then
-    for ext in $(jq -r '.recommendations[]' < $git_root/.vscode/extensions.json); do
+    for ext in $(jq -r '.recommendations[]' < $git_root/../dev-setup/.vscode/extensions.json); do
         code --install-extension `echo $ext | sed 's/\r$//'`
     done
     exit 0
@@ -206,11 +206,11 @@ if [ $do_clone_repo -eq 1 ]; then
         && clone_repo $HOME/.config/nvim/ git@github.com:JaySinco/nvim.git master \
         && if [ ! -d $HOME/.local/share/nvim/site ]; then
             mkdir -p $HOME/.local/share/nvim/ \
-            && unzip $git_root/src/nvim-data-site-v2022.09.24.zip -d $HOME/.local/share/nvim/
+            && unzip $git_root/../dev-setup/src/nvim-data-site-v2022.09.24.zip -d $HOME/.local/share/nvim/
         fi \
         && if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
             mkdir -p $HOME/.local/share/fonts \
-            && unzip $git_root/src/FiraMono.zip -d $HOME/.local/share/fonts
+            && unzip $git_root/../dev-setup/src/FiraMono.zip -d $HOME/.local/share/fonts
         fi
     fi
     exit 0
@@ -224,12 +224,12 @@ function update_repo() {
 
 if [ $do_update_repo -eq 1 ]; then
     if [ $os = "windows" ]; then
-        update_repo $git_root \
+        update_repo $git_root/../dev-setup \
         && update_repo $git_root/../Prototyping \
         && update_repo $APPDATA/Code/User \
         && update_repo $APPDATA/alacritty
     else
-        update_repo $git_root \
+        update_repo $git_root/../dev-setup \
         && update_repo $git_root/../Prototyping \
         && update_repo $HOME/.config/Code/User \
         && update_repo $HOME/.config/nvim
@@ -245,12 +245,12 @@ function status_repo() {
 
 if [ $do_status_repo -eq 1 ]; then
     if [ $os = "windows" ]; then
-        status_repo $git_root \
+        status_repo $git_root/../dev-setup \
         && status_repo $git_root/../Prototyping \
         && status_repo $APPDATA/Code/User \
         && status_repo $APPDATA/alacritty
     else
-        status_repo $git_root \
+        status_repo $git_root/../dev-setup \
         && status_repo $git_root/../Prototyping \
         && status_repo $HOME/.config/Code/User \
         && status_repo $HOME/.config/nvim

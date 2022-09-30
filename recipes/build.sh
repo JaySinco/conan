@@ -60,16 +60,16 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 git_root="$(git rev-parse --show-toplevel)"
 
 if [ $os = "linux" ]; then
-    source_repo=$git_root/src
+    source_repo=$git_root/../dev-setup/src
 elif [ $os = "windows" ]; then
     source_repo=$HOME/OneDrive/src
 fi
 
 export JAYSINCO_SOURCE_REPO=$source_repo
-export PYTHONPATH=$git_root/recipes
+export PYTHONPATH=$git_root/../dev-setup/recipes
 
 conan_ref="jaysinco/stable"
-conan_profile="$git_root/profiles/$arch-$os.profile"
+conan_profile="$git_root/../dev-setup/profiles/$arch-$os.profile"
 build_type=Release
 
 if [ $build_debug -eq 1 ]; then
@@ -124,7 +124,7 @@ function do_recipe() {
 }
 
 for target in "${build_targets[@]}"; do
-    target_dir=$git_root/recipes/$target
+    target_dir=$git_root/../dev-setup/recipes/$target
     if [ ! -d "$target_dir" ]; then
         echo "skip non-existent target '$target'" && continue
     fi
