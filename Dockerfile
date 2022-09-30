@@ -54,19 +54,11 @@ RUN apt-get update -y \
     && make install \
     && rm -rf /tmp/cmake-3.23.1 /tmp/cmake-3.23.1.tar.gz
 
-# clang
+# qt5 deps
 # -----------------
 RUN apt-get update -y \
     && apt-get install -y wget software-properties-common \
-    && wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
-    && add-apt-repository 'deb https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/focal/ llvm-toolchain-focal-13 main' \
-    && apt-get update -y \
-    && apt-get install -y clang-13 lldb-13 lld-13 clangd-13 clang-format-13 libc++-13-dev libc++abi-13-dev \
-    && ln -s /usr/bin/clang-13 /usr/bin/clang \
-    && ln -s /usr/bin/clang++-13 /usr/bin/clang++ \
-    && ln -s /usr/bin/ld.lld-13 /usr/bin/ld.lld \
-    && ln -s /usr/bin/clangd-13 /usr/bin/clangd \
-    && ln -s /usr/bin/clang-format-13 /usr/bin/clang-format
+    && apt-get build-dep -y qt5-default
 
 # gcc
 # -----------------
@@ -76,10 +68,14 @@ RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test \
     && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 \
         --slave /usr/bin/g++ g++ /usr/bin/g++-11
 
-# Qt5 build deps
+# clangd
 # -----------------
-RUN apt-get update -y \
-    && apt-get build-dep -y qt5-default
+RUN wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
+    && add-apt-repository 'deb https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/focal/ llvm-toolchain-focal-15 main' \
+    && apt-get update -y \
+    && apt-get install -y clangd-15 clang-format-15 \
+    && ln -s /usr/bin/clangd-15 /usr/bin/clangd \
+    && ln -s /usr/bin/clang-format-15 /usr/bin/clang-format
 
 # common utils
 # -----------------

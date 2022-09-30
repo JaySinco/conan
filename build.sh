@@ -104,9 +104,7 @@ if [ $do_build_all -eq 1 ]; then
     && package 0 openssl \
     && package 1 libevent \
     && package 1 zstd \
-    && package 1 snappy \
     && package 1 lz4 \
-    && package 1 folly \
     && package 0 argparse \
     && package 0 range-v3 \
     && echo done!
