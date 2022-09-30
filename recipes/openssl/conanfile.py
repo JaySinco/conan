@@ -108,8 +108,11 @@ class OpenSSLConan(MyConanFile):
     def _target(self):
         if is_msvc(self):
             return "VC-WIN64A"
-        else:
+        if self.settings.compiler == "gcc":
+            return "linux-x86_64"
+        if self.settings.compiler == "clang":
             return "linux-x86_64-clang"
+        return None
 
     def _make_exe(self):
         if is_msvc(self):

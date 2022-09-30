@@ -68,6 +68,14 @@ RUN apt-get update -y \
     && ln -s /usr/bin/clangd-13 /usr/bin/clangd \
     && ln -s /usr/bin/clang-format-13 /usr/bin/clang-format
 
+# gcc
+# -----------------
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test \
+    && apt-get update -y \
+    && apt-get install -y gcc-11 g++-11 \
+    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 \
+        --slave /usr/bin/g++ g++ /usr/bin/g++-11
+
 # Qt5 build deps
 # -----------------
 RUN apt-get update -y \

@@ -8,7 +8,7 @@ from conan.tools.build import build_jobs
 
 class QtConan(MyConanFile):
     name = "qt"
-    version = "5.15.3"
+    version = "5.15.6"
     homepage = "https://download.qt.io/official_releases/qt/"
     description = "Qt is a cross-platform framework for graphical user interfaces"
     license = "LGPL-3.0"
