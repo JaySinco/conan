@@ -47,7 +47,7 @@ while [[ $# -gt 0 ]]; do
         -n) do_clone_repo=1 && shift ;;
         -p) do_update_repo=1 && shift ;;
         -s) do_status_repo=1 && shift ;;
-        -*) echo "Unknown option: $1" && exit 1 ;;
+         *) echo "Unknown option: $1" && exit 1 ;;
     esac
 done
 
