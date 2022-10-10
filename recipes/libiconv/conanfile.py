@@ -2,11 +2,8 @@ import sys
 import os
 from myconanfile import MyConanFile
 from conans import ConanFile, tools, AutoToolsBuildEnvironment
-from conan.tools.env import VirtualBuildEnv
 from conan.tools.microsoft import msvc_runtime_flag, is_msvc
-from conan.tools.cmake import CMakeToolchain, CMake
 from conan.tools.files import collect_libs, copy, rmdir
-from conan.tools.gnu import Autotools, AutotoolsToolchain, AutotoolsDeps, PkgConfigDeps
 from contextlib import contextmanager
 import functools
 
@@ -85,7 +82,6 @@ class LibiconvConan(MyConanFile):
                 "NM": "dumpbin -symbols"
             })
             env_vars["win32_target"] = "_WIN32_WINNT_VISTA"
-            env_vars["MSYS2_PATH_TYPE"] = "inherit"
 
         if not tools.cross_building(self) or is_msvc(self) or self._is_clang_cl:
             rc = None

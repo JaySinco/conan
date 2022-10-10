@@ -31,4 +31,7 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/msys2/msys/$arch
 
 ### 依赖项
 
-执行 `pacman -S mingw-w64-x86_64-jq`
+```
+pacman -S mingw-w64-x86_64-jq mingw-w64-x86_64-make mingw-w64-x86_64-gcc
+cp /mingw64/bin/mingw32-make /mingw64/bin/make
+```
