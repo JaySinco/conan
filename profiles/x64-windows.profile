@@ -12,3 +12,5 @@ build_type=Release
 [env]
 [conf]
 tools.cmake.cmaketoolchain:generator=Ninja
+tools.microsoft.bash:subsystem=msys2
+tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe

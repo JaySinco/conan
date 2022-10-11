@@ -63,7 +63,6 @@ if [ $os = "linux" ]; then
     source_repo=$git_root/../dev-setup/src
 elif [ $os = "windows" ]; then
     source_repo=$USERPROFILE/OneDrive/src
-    export CONAN_BASH_PATH=C:/msys64/usr/bin/bash
 fi
 
 export JAYSINCO_SOURCE_REPO=$source_repo

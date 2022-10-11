@@ -1,6 +1,7 @@
 ## MSYS2
 
 ### 镜像
+
 编辑 `/etc/pacman.d/mirrorlist.mingw32` ，在文件开头添加：
 ```
 Server = https://mirrors.tuna.tsinghua.edu.cn/msys2/mingw/i686
@@ -28,10 +29,16 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/msys2/msys/$arch
 
 然后执行 `pacman -Sy` 刷新软件包数据即可
 
+### Git提示符
 
-### 依赖项
-
+编辑 `~/.bashrc` ，在文件末尾添加：
+```shell
+shopt -q login_shell || . /etc/profile.d/git-prompt.sh
 ```
-pacman -S mingw-w64-x86_64-jq mingw-w64-x86_64-make mingw-w64-x86_64-gcc
-cp /mingw64/bin/mingw32-make /mingw64/bin/make
+
+### 安装包
+
+执行shell命令
+```shell
+pacman -S base-devel binutils gcc vim mingw-w64-x86_64-jq
 ```
