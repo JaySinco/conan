@@ -38,7 +38,7 @@ shopt -q login_shell || . /etc/profile.d/git-prompt.sh
 
 ### 安装包
 
-执行shell命令
+在 `MSYSTEM=MSYS` 环境中执行shell命令
 ```shell
 pacman -S base-devel binutils gcc vim mingw-w64-x86_64-jq mingw-w64-x86_64-ninja
 ```

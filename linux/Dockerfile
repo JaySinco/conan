@@ -127,7 +127,7 @@ ENV XDG_RUNTIME_DIR=/home/jaysinco/xdg-runtime-root \
     PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}" \
     LD_LIBRARY_PATH="/home/jaysinco/.conan/data/torch/1.8.2/jaysinco/stable/package/4db1be536558d833e52e862fd84d64d75c2b3656/lib"
 
-COPY resources/linux/git-prompt.sh /etc/profile.d
+COPY git-prompt.sh /etc/profile.d
 
 RUN mkdir -p $XDG_RUNTIME_DIR \
     && git config --global user.name jaysinco \

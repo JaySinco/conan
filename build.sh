@@ -113,14 +113,14 @@ if [ $do_build_all -eq 1 ]; then
 fi
 
 if [ $do_mount -eq 1 ]; then
-    mkdir -p $git_root/../dev-setup/src
+    mkdir -p $git_root/../dev-setup/linux/src
     if [ $do_vmware -eq 0 ]; then
         sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
-            share $git_root/../dev-setup/src
+            share $git_root/../dev-setup/linux/src
     else
         # apt install open-vm-tools open-vm-tools-desktop
         vmhgfs-fuse -o ro,uid=$(id -u),gid=$(id -g) \
-            .host:/share $git_root/../dev-setup/src
+            .host:/share $git_root/../dev-setup/linux/src
     fi
     exit 0
 fi
@@ -129,16 +129,16 @@ if [ $do_unmount -eq 1 ]; then
     if [ $do_vmware -eq 0 ]; then
         sudo umount -a -t vboxsf
     else
-        sudo umount $git_root/../dev-setup/src
+        sudo umount $git_root/../dev-setup/linux/src
     fi
     exit 0
 fi
 
 if [ $do_build_docker -eq 1 ]; then
     docker build \
-        -f $git_root/../dev-setup/Dockerfile \
+        -f $git_root/../dev-setup/linux/Dockerfile \
         -t $docker_image_tag \
-        $git_root/../dev-setup
+        $git_root/../dev-setup/linux
     exit 0
 fi
 
@@ -205,11 +205,11 @@ if [ $do_clone_repo -eq 1 ]; then
         && clone_repo $HOME/.config/nvim/ git@github.com:JaySinco/nvim.git master \
         && if [ ! -d $HOME/.local/share/nvim/site ]; then
             mkdir -p $HOME/.local/share/nvim/ \
-            && unzip $git_root/../dev-setup/src/nvim-data-site-v2022.09.24.zip -d $HOME/.local/share/nvim/
+            && unzip $git_root/../dev-setup/linux/src/nvim-data-site-v2022.09.24.zip -d $HOME/.local/share/nvim/
         fi \
         && if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
             mkdir -p $HOME/.local/share/fonts \
-            && unzip $git_root/../dev-setup/src/FiraMono.zip -d $HOME/.local/share/fonts
+            && unzip $git_root/../dev-setup/linux/src/FiraMono.zip -d $HOME/.local/share/fonts
         fi
     fi
     exit 0
