@@ -58,7 +58,23 @@ esac
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 git_root="$(git rev-parse --show-toplevel)"
+linux_res_dir=$git_root/../dev-setup/linux
+windows_res_dir=$git_root/../dev-setup/windows
 docker_image_tag=build:v1
+
+if [ $os = "linux" ]; then
+    source_repo=$linux_res_dir/src
+    nvim_config_dir=$HOME/.config/nvim
+    nvim_data_dir=$HOME/.local/share/nvim
+    vscode_config_dir=$HOME/.config/Code
+    vscode_config_branch=linux
+elif [ $os = "windows" ]; then
+    source_repo=$USERPROFILE/OneDrive/src
+    nvim_config_dir=$LOCALAPPDATA/nvim
+    nvim_data_dir=$LOCALAPPDATA/nvim-data
+    vscode_config_dir=$APPDATA/Code
+    vscode_config_branch=master
+fi
 
 function package() {
     local build_debug=$1
@@ -113,14 +129,14 @@ if [ $do_build_all -eq 1 ]; then
 fi
 
 if [ $do_mount -eq 1 ]; then
-    mkdir -p $git_root/../dev-setup/linux/src
+    mkdir -p $source_repo
     if [ $do_vmware -eq 0 ]; then
         sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
-            share $git_root/../dev-setup/linux/src
+            share $source_repo
     else
         # apt install open-vm-tools open-vm-tools-desktop
         vmhgfs-fuse -o ro,uid=$(id -u),gid=$(id -g) \
-            .host:/share $git_root/../dev-setup/linux/src
+            .host:/share $source_repo
     fi
     exit 0
 fi
@@ -129,25 +145,25 @@ if [ $do_unmount -eq 1 ]; then
     if [ $do_vmware -eq 0 ]; then
         sudo umount -a -t vboxsf
     else
-        sudo umount $git_root/../dev-setup/linux/src
+        sudo umount $source_repo
     fi
     exit 0
 fi
 
 if [ $do_build_docker -eq 1 ]; then
     docker build \
-        -f $git_root/../dev-setup/linux/Dockerfile \
+        -f $linux_res_dir/Dockerfile \
         -t $docker_image_tag \
-        $git_root/../dev-setup/linux
+        $linux_res_dir
     exit 0
 fi
 
 if [ $do_run_docker -eq 1 ]; then
     mkdir -p \
         $HOME/.ssh \
-        $HOME/.config/nvim \
-        $HOME/.local/share/nvim \
-        $HOME/.config/Code \
+        $nvim_config_dir \
+        $nvim_data_dir \
+        $vscode_config_dir \
         $HOME/.vscode \
         $HOME/.conan
     docker run -it --rm \
@@ -158,9 +174,9 @@ if [ $do_run_docker -eq 1 ]; then
         -e LOCAL_GID=$(id -g) \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $HOME/.ssh:/home/jaysinco/.ssh:ro \
-        -v $HOME/.config/nvim:/home/jaysinco/.config/nvim:rw \
-        -v $HOME/.local/share/nvim:/home/jaysinco/.local/share/nvim:rw \
-        -v $HOME/.config/Code:/home/jaysinco/.config/Code:rw \
+        -v $nvim_config_dir:/home/jaysinco/.config/nvim:rw \
+        -v $nvim_data_dir:/home/jaysinco/.local/share/nvim:rw \
+        -v $vscode_config_dir:/home/jaysinco/.config/Code:rw \
         -v $HOME/.vscode:/home/jaysinco/.vscode:rw \
         -v $HOME/.conan:/home/jaysinco/.conan:rw \
         -v $git_root/../dev-setup:/home/jaysinco/dev-setup:rw \
@@ -195,22 +211,20 @@ function clone_repo() {
 }
 
 if [ $do_clone_repo -eq 1 ]; then
+    clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
+    && clone_repo $vscode_config_dir/User git@github.com:JaySinco/vscode.git $vscode_config_branch \
+    && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master && \
     if [ $os = "windows" ]; then
-        clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
-        && clone_repo $APPDATA/Code/User git@github.com:JaySinco/vscode.git master \
-        && clone_repo $APPDATA/alacritty git@github.com:JaySinco/alacritty.git master
+        clone_repo $APPDATA/alacritty git@github.com:JaySinco/alacritty.git master
     else
-        clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
-        && clone_repo $HOME/.config/Code/User git@github.com:JaySinco/vscode.git linux \
-        && clone_repo $HOME/.config/nvim/ git@github.com:JaySinco/nvim.git master \
-        && if [ ! -d $HOME/.local/share/nvim/site ]; then
-            mkdir -p $HOME/.local/share/nvim/ \
-            && unzip $git_root/../dev-setup/linux/src/nvim-data-site-v2022.09.24.zip -d $HOME/.local/share/nvim/
-        fi \
-        && if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
+        if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
             mkdir -p $HOME/.local/share/fonts \
-            && unzip $git_root/../dev-setup/linux/src/FiraMono.zip -d $HOME/.local/share/fonts
+            && unzip $source_repo/FiraMono.zip -d $HOME/.local/share/fonts
         fi
+    fi && \
+    if [ ! -d $nvim_data_dir/site ]; then
+        mkdir -p $nvim_data_dir \
+        && unzip $source_repo/nvim-data-site-v2022.09.24.zip -d $nvim_data_dir
     fi
     exit 0
 fi
@@ -227,16 +241,12 @@ function update_repo() {
 }
 
 if [ $do_update_repo -eq 1 ]; then
-    if [ $os = "windows" ]; then
-        update_repo $git_root/../dev-setup \
-        && update_repo $git_root/../Prototyping \
-        && update_repo $APPDATA/Code/User \
-        && update_repo $APPDATA/alacritty
-    else
-        update_repo $git_root/../dev-setup \
-        && update_repo $git_root/../Prototyping \
-        && update_repo $HOME/.config/Code/User \
-        && update_repo $HOME/.config/nvim
+    update_repo $git_root/../dev-setup \
+    && update_repo $git_root/../Prototyping \
+    && update_repo $vscode_config_dir/User \
+    && update_repo $nvim_config_dir && \
+    if [ $os = "windows" ]; then \
+        update_repo $APPDATA/alacritty
     fi
     exit 0
 fi
@@ -253,16 +263,12 @@ function status_repo() {
 }
 
 if [ $do_status_repo -eq 1 ]; then
-    if [ $os = "windows" ]; then
-        status_repo $git_root/../dev-setup \
-        && status_repo $git_root/../Prototyping \
-        && status_repo $APPDATA/Code/User \
-        && status_repo $APPDATA/alacritty
-    else
-        status_repo $git_root/../dev-setup \
-        && status_repo $git_root/../Prototyping \
-        && status_repo $HOME/.config/Code/User \
-        && status_repo $HOME/.config/nvim
+    status_repo $git_root/../dev-setup \
+    && status_repo $git_root/../Prototyping \
+    && status_repo $vscode_config_dir/User \
+    && status_repo $nvim_config_dir && \
+    if [ $os = "windows" ]; then \
+        status_repo $APPDATA/alacritty
     fi
     exit 0
 fi
