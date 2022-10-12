@@ -30,7 +30,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -l   list vscode extensions"
             echo "  -i   install vscode extensions"
             echo "  -n   clone all repo"
-            echo "  -p   update all repo"
+            echo "  -p   pull/push all repo"
             echo "  -s   list all repo status"
             echo "  -h   print command line options"
             echo
@@ -216,9 +216,14 @@ if [ $do_clone_repo -eq 1 ]; then
 fi
 
 function update_repo() {
-    echo "** UPDATE $1" \
-        && cd $1 \
-        && git pull
+    cd $1
+    echo "pull* "`realpath $1`
+    git pull
+    git merge-base --is-ancestor HEAD @{u}
+    if [ $? -ne 0 ]; then
+        echo "push*" `realpath $1`
+        git push
+    fi
 }
 
 if [ $do_update_repo -eq 1 ]; then
@@ -239,7 +244,9 @@ fi
 function status_repo() {
     cd $1
     if [ ! -z "$(git status --porcelain)" ]; then
-        echo === `realpath $1` === \
+        echo ================== \
+        && echo `realpath $1` \
+        && echo ================== \
         && git status --porcelain \
         && echo
     fi
