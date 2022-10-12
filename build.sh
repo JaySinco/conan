@@ -224,7 +224,7 @@ if [ $do_clone_repo -eq 1 ]; then
     fi && \
     if [ ! -d $nvim_data_dir/site ]; then
         mkdir -p $nvim_data_dir \
-        && unzip $source_repo/nvim-data-site-v2022.09.24.zip -d $nvim_data_dir
+        && unzip -q $source_repo/nvim-data-site-v2022.09.24-$os.zip -d $nvim_data_dir
     fi
     exit 0
 fi
