@@ -237,9 +237,12 @@ if [ $do_update_repo -eq 1 ]; then
 fi
 
 function status_repo() {
-    echo "** STATUS $1" \
-        && cd $1 \
-        && git status
+    cd $1
+    if [ ! -z "$(git status --porcelain)" ]; then
+        echo === `realpath $1` === \
+        && git status --porcelain \
+        && echo
+    fi
 }
 
 if [ $do_status_repo -eq 1 ]; then
