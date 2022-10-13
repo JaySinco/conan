@@ -10,7 +10,7 @@ do_build_docker=0
 do_run_docker=0
 do_list_ext=0
 do_install_ext=0
-do_clone_repo=0
+do_env_setup=0
 do_update_repo=0
 do_status_repo=0
 
@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -r   run docker"
             echo "  -l   list vscode extensions"
             echo "  -i   install vscode extensions"
-            echo "  -n   clone all repo"
+            echo "  -n   env setup"
             echo "  -p   pull/push all repo"
             echo "  -s   list all repo status"
             echo "  -h   print command line options"
@@ -44,7 +44,7 @@ while [[ $# -gt 0 ]]; do
         -r) do_run_docker=1 && shift ;;
         -l) do_list_ext=1 && shift ;;
         -i) do_install_ext=1 && shift ;;
-        -n) do_clone_repo=1 && shift ;;
+        -n) do_env_setup=1 && shift ;;
         -p) do_update_repo=1 && shift ;;
         -s) do_status_repo=1 && shift ;;
          *) echo "Unknown option: $1" && exit 1 ;;
@@ -210,18 +210,19 @@ function clone_repo() {
     fi
 }
 
-if [ $do_clone_repo -eq 1 ]; then
-    clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
-    && clone_repo $vscode_config_dir/User git@github.com:JaySinco/vscode.git $vscode_config_branch \
-    && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master && \
+if [ $do_env_setup -eq 1 ]; then
     if [ $os = "windows" ]; then
-        clone_repo $APPDATA/alacritty git@github.com:JaySinco/alacritty.git master
+        $windows_res_dir/set-env.sh \
+        && clone_repo $APPDATA/alacritty git@github.com:JaySinco/alacritty.git master
     else
         if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
             mkdir -p $HOME/.local/share/fonts \
             && unzip $source_repo/FiraMono.zip -d $HOME/.local/share/fonts
         fi
-    fi && \
+    fi \
+    && clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
+    && clone_repo $vscode_config_dir/User git@github.com:JaySinco/vscode.git $vscode_config_branch \
+    && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master && \
     if [ ! -d $nvim_data_dir/site ]; then
         mkdir -p $nvim_data_dir \
         && unzip -q $source_repo/nvim-data-site-v2022.09.24-$os.zip -d $nvim_data_dir

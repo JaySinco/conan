@@ -1,3 +1,5 @@
+# Windows
+
 ## MSYS2
 
 ### 镜像
@@ -35,3 +37,11 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/msys2/msys/$arch
 ```shell
 shopt -q login_shell || . /etc/profile.d/git-prompt.sh
 ```
+
+## 安装软件
+- Visual Studio
+- VSCode
+- Alacritty
+- LLVM
+- MSYS2
+- PortableGit
