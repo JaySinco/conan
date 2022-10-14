@@ -199,21 +199,23 @@ if [ $do_install_ext -eq 1 ]; then
 fi
 
 function clone_repo() {
-    if [ ! -d $1/.git ]; then
+    if [ ! -d "$1/.git" ]; then
         echo "** CLONE $2 -b $3" \
-        && mkdir -p $1 \
-        && cd $1 \
+        && mkdir -p "$1" \
+        && cd "$1" \
         && git init \
         && git remote add origin $2 \
         && git fetch \
-        && git checkout origin/$3 -b $3
+        && git checkout origin/$3 -b $3 \
+        && git config user.name jaysinco \
+        && git config user.email jaysinco@163.com
     fi
 }
 
 if [ $do_env_setup -eq 1 ]; then
     if [ $os = "windows" ]; then
         $windows_res_dir/set-env.sh \
-        && clone_repo $APPDATA/alacritty git@github.com:JaySinco/alacritty.git master
+        && clone_repo $LOCALAPPDATA/Microsoft/Windows\ Terminal git@github.com:JaySinco/windows-terminal.git master
     else
         if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
             mkdir -p $HOME/.local/share/fonts \
@@ -231,12 +233,12 @@ if [ $do_env_setup -eq 1 ]; then
 fi
 
 function update_repo() {
-    cd $1
-    echo "pull* "`realpath $1`
+    cd "$1"
+    echo "pull* "`realpath "$1"`
     git pull
     git merge-base --is-ancestor HEAD @{u}
     if [ $? -ne 0 ]; then
-        echo "push*" `realpath $1`
+        echo "push*" `realpath "$1"`
         git push
     fi
 }
@@ -247,16 +249,16 @@ if [ $do_update_repo -eq 1 ]; then
     && update_repo $vscode_config_dir/User \
     && update_repo $nvim_config_dir && \
     if [ $os = "windows" ]; then \
-        update_repo $APPDATA/alacritty
+        update_repo $LOCALAPPDATA/Microsoft/Windows\ Terminal
     fi
     exit 0
 fi
 
 function status_repo() {
-    cd $1
+    cd "$1"
     if [ ! -z "$(git status --porcelain)" ]; then
         echo ================== \
-        && echo `realpath $1` \
+        && echo `realpath "$1"` \
         && echo ================== \
         && git status --porcelain \
         && echo
@@ -269,7 +271,7 @@ if [ $do_status_repo -eq 1 ]; then
     && status_repo $vscode_config_dir/User \
     && status_repo $nvim_config_dir && \
     if [ $os = "windows" ]; then \
-        status_repo $APPDATA/alacritty
+        status_repo $LOCALAPPDATA/Microsoft/Windows\ Terminal
     fi
     exit 0
 fi
