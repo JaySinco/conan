@@ -244,13 +244,13 @@ function update_repo() {
 }
 
 if [ $do_update_repo -eq 1 ]; then
-    update_repo $git_root/../dev-setup \
+    if [ $os = "windows" ]; then
+        update_repo $LOCALAPPDATA/Microsoft/Windows\ Terminal
+    fi \
+    && update_repo $git_root/../dev-setup \
     && update_repo $git_root/../Prototyping \
     && update_repo $vscode_config_dir/User \
-    && update_repo $nvim_config_dir && \
-    if [ $os = "windows" ]; then \
-        update_repo $LOCALAPPDATA/Microsoft/Windows\ Terminal
-    fi
+    && update_repo $nvim_config_dir
     exit 0
 fi
 
