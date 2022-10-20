@@ -16,6 +16,7 @@
         "ms-toolsai.vscode-jupyter-slideshow",
         "ms-vscode.cpptools",
         "ms-vscode.hexeditor",
+        "slevesque.shader",
         "twxs.cmake",
         "vscode-icons-team.vscode-icons"
     ]
