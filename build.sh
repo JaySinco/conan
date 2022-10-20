@@ -124,6 +124,7 @@ if [ $do_build_all -eq 1 ]; then
     && package 0 argparse \
     && package 0 range-v3 \
     && package 1 libiconv \
+    && package 1 raylib \
     && echo done!
     exit 0
 fi
