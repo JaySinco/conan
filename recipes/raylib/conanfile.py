@@ -54,6 +54,9 @@ class RaylibConan(MyConanFile):
         cmake.install()
         rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
+        copy(self, "glad.h",
+            dst=os.path.join(self.package_folder, "include"),
+            src=os.path.join(self.source_folder, "src", "external"))
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "raylib")
