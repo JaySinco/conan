@@ -125,6 +125,7 @@ if [ $do_build_all -eq 1 ]; then
     && package 0 range-v3 \
     && package 1 libiconv \
     && package 1 raylib \
+    && package 0 nlohmann-json \
     && echo done!
     exit 0
 fi
