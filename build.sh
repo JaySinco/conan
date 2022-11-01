@@ -127,6 +127,8 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 raylib \
     && package 0 nlohmann-json \
     && package 1 sdl \
+    && package 1 libuv \
+    && package 1 usockets \
     && echo done!
     exit 0
 fi
