@@ -129,6 +129,7 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 sdl \
     && package 1 libuv \
     && package 1 usockets \
+    && package 0 uwebsockets \
     && echo done!
     exit 0
 fi

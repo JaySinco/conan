@@ -7,7 +7,7 @@ from conans import MSBuild, AutoToolsBuildEnvironment
 
 class UsocketsConan(MyConanFile):
     name = "usockets"
-    version = "0.8.2"
+    version = "0.8.1"
     homepage = "https://github.com/uNetworking/uSockets"
     description = "Miniscule cross-platform eventing, networking & crypto for async applications"
     license = "Apache-2.0"
@@ -42,6 +42,7 @@ class UsocketsConan(MyConanFile):
         self._patch_sources(self._dirname(__file__), [
             "0001-fix-makefile-flags.patch",
             "0002-fix-vcxproj-static.patch",
+            "0003-fix-vcxproj-use-openssl.patch",
         ])
 
     def _build_msvc(self):
