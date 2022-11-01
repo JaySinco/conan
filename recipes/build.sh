@@ -97,26 +97,31 @@ function do_recipe() {
     fi
 
     if [ $do_source -eq 1 -o $do_create -eq 1 ]; then
+        sleep 1s
         conan source $recipe_dir
     fi
 
     if [ $do_install -eq 1 -o $do_create -eq 1 ]; then
+        sleep 1s
         conan install $common_args \
             --build=never \
             $recipe_dir $conan_ref
     fi
 
     if [ $do_build -eq 1 -o $do_create -eq 1 ]; then
+        sleep 1s
         conan build \
             --install-folder=$install_folder \
             $recipe_dir
     fi
 
     if [ $do_export -eq 1 ]; then
+        sleep 1s
         conan export $recipe_dir $conan_ref
     fi
 
     if [ $do_export_package -eq 1 -o $do_create -eq 1 ]; then
+        sleep 1s
         conan export-pkg $common_args \
             --force \
             $recipe_dir $conan_ref
