@@ -53,14 +53,22 @@ class ZlibConan(MyConanFile):
     def package(self):
         cmake = CMake(self)
         cmake.install()
+        if self.settings.os in ["Linux", "FreeBSD"]:
+            mask = "*.so*"
+            if self.options.shared:
+                mask = "*.a"
+            tools.remove_files_by_mask(os.path.join(self.package_folder, "lib"), mask)
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "ZLIB")
         self.cpp_info.set_property("cmake_target_name", "ZLIB::ZLIB")
         self.cpp_info.set_property("pkg_config_name", "zlib")
-        libname = "zlib"
-        if not self.options.shared:
-            libname += "static"
-        if self.settings.build_type == "Debug":
-            libname += "d"
+        if self.settings.os == "Windows":
+            libname = "zlib"
+            if not self.options.shared:
+                libname += "static"
+            if self.settings.build_type == "Debug":
+                libname += "d"
+        elif self.settings.os in ["Linux", "FreeBSD"]:
+            libname = "z"
         self.cpp_info.libs = [libname]
