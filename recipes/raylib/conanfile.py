@@ -66,6 +66,6 @@ class RaylibConan(MyConanFile):
         if is_msvc(self) and self.options.shared:
             self.cpp_info.defines.append("USE_LIBTYPE_SHARED")
         if self.settings.os in ["Linux", "FreeBSD"]:
-            self.cpp_info.system_libs.extend(["m", "pthread"])
+            self.cpp_info.system_libs.extend(["m", "pthread", "dl"])
         elif self.settings.os == "Windows":
             self.cpp_info.system_libs.append("winmm")
