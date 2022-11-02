@@ -98,6 +98,7 @@ if [ $do_build_all -eq 1 ]; then
     && package_tools \
     && package 1 gflags \
     && package 1 glog \
+    && package 1 gtest \
     && package 1 fmt \
     && package 1 spdlog \
     && package 0 boost \
