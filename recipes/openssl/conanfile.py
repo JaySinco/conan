@@ -79,6 +79,7 @@ class OpenSSLConan(MyConanFile):
             self.cpp_info.components["crypto"].libs = ["crypto"]
 
         self.cpp_info.components["ssl"].requires = ["crypto"]
+        self.cpp_info.components["crypto"].requires = ["zlib::zlib"]
 
         if self.settings.os == "Windows":
             self.cpp_info.components["crypto"].system_libs.extend(

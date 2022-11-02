@@ -133,6 +133,8 @@ if [ $do_build_all -eq 1 ]; then
     && package 0 uwebsockets \
     && package 1 libcurl \
     && package 1 cpr \
+    && package 1 sqlite3 \
+    && package 1 mongoose \
     && echo done!
     exit 0
 fi
