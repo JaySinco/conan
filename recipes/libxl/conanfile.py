@@ -44,6 +44,9 @@ class LibxlConan(MyConanFile):
         cmake.configure()
         cmake.build()
 
+    def package_id(self):
+        del self.info.settings.build_type
+
     def package(self):
         cmake = CMake(self)
         cmake.install()

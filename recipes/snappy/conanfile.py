@@ -33,6 +33,9 @@ class SnappyConan(MyConanFile):
     def source(self):
         srcFile = self._src_abspath(f"{self.name}-{self.version}.tar.gz")
         tools.unzip(srcFile, destination=self.source_folder, strip_root=True)
+        self._patch_sources(self._dirname(__file__), [
+            "0001-fix-inlining-failure.patch",
+        ])
 
     def generate(self):
         tc = CMakeToolchain(self)
