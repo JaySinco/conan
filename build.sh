@@ -123,7 +123,6 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 zstd \
     && package 1 lz4 \
     && package 1 snappy \
-    && package 1 folly \
     && package 0 libxl \
     && package 0 argparse \
     && package 0 range-v3 \
