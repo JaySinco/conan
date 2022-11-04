@@ -137,6 +137,8 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 cpr \
     && package 1 sqlite3 \
     && package 1 mongoose \
+    && package 0 concurrentqueue \
+    && package 0 threadpool \
     && echo done!
     exit 0
 fi
