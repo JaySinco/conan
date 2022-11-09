@@ -85,17 +85,23 @@ function package() {
     fi
 }
 
-function package_tools() {
+function package_linux() {
+    if [ $os = "linux" ]; then
+        package $*
+    fi
+}
+
+function package_win() {
     if [ $os = "windows" ]; then
-        package 0 jom \
-        && package 0 nasm \
-        && package 0 strawberryperl
+        package $*
     fi
 }
 
 if [ $do_build_all -eq 1 ]; then
     echo start! \
-    && package_tools \
+    && package_win 0 jom \
+    && package_win 0 nasm \
+    && package_win 0 strawberryperl \
     && package 1 gflags \
     && package 1 glog \
     && package 1 gtest \
@@ -234,7 +240,7 @@ if [ $do_env_setup -eq 1 ]; then
     else
         if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
             mkdir -p $HOME/.local/share/fonts \
-            && unzip $source_repo/FiraMono.zip -d $HOME/.local/share/fonts
+            && unzip $source_repo/font-fira-mono.zip -d $HOME/.local/share/fonts
         fi
     fi \
     && clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \

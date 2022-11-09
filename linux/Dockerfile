@@ -109,7 +109,7 @@ RUN sudo apt-get update -y \
 COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
      src/lua-language-server-3.2.5-linux-x64.tar.gz \
      src/code_1.71.2-1663191218_amd64.deb \
-     src/FiraMono.zip \
+     src/font-fira-mono.zip \
      /tmp/
 
 RUN cd /tmp \
@@ -118,7 +118,7 @@ RUN cd /tmp \
     && sudo tar zxf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
     && sudo dpkg -i code_1.71.2-1663191218_amd64.deb \
     && mkdir -p /home/jaysinco/.local/share \
-    && sudo unzip FiraMono.zip -d /home/jaysinco/.local/share/fonts \
+    && sudo unzip font-fira-mono.zip -d /home/jaysinco/.local/share/fonts \
     && sudo rm -rf /tmp/*
 
 # config

@@ -15,15 +15,15 @@ MSYSTEM=MSYS /usr/bin/bash --login $script_dir/set-msys.sh
 if [ ! -f ~/.ssh/id_rsa ]; then
     echo "copy ~/.ssh key"
     mkdir -p ~/.ssh
-    cp $source_repo/id_rsa ~/.ssh
-    cp $source_repo/id_rsa.pub ~/.ssh
+    cp $source_repo/res/id_rsa ~/.ssh
+    cp $source_repo/res/id_rsa.pub ~/.ssh
 fi
 
 if [ ! -f $USERPROFILE/.ssh/id_rsa ]; then
     echo 'copy $USERPROFILE/.ssh key'
     mkdir -p $USERPROFILE/.ssh
-    cp $source_repo/id_rsa $USERPROFILE/.ssh
-    cp $source_repo/id_rsa.pub $USERPROFILE/.ssh
+    cp $source_repo/res/id_rsa $USERPROFILE/.ssh
+    cp $source_repo/res/id_rsa.pub $USERPROFILE/.ssh
 fi
 
 if [ ! -d $program_files_dir/nvim-win64 ]; then
