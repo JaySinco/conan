@@ -68,14 +68,15 @@ RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test \
     && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 \
         --slave /usr/bin/g++ g++ /usr/bin/g++-11
 
-# clangd
+# clang
 # -----------------
 RUN wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
     && add-apt-repository 'deb https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/focal/ llvm-toolchain-focal-15 main' \
     && apt-get update -y \
-    && apt-get install -y clangd-15 clang-format-15 \
+    && apt-get install -y clangd-15 clang-format-15 clang-tidy-15 \
     && ln -s /usr/bin/clangd-15 /usr/bin/clangd \
-    && ln -s /usr/bin/clang-format-15 /usr/bin/clang-format
+    && ln -s /usr/bin/clang-format-15 /usr/bin/clang-format \
+    && ln -s /usr/bin/clang-tidy-15 /usr/bin/clang-tidy
 
 # common utils
 # -----------------
