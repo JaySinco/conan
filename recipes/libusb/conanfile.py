@@ -62,6 +62,7 @@ class LibUSBConan(MyConanFile):
                 msbuild.build(solution_file, platforms=platforms, upgrade_project=False, build_type=build_type)
         else:
             autotools = Autotools(self)
+            autotools.autoreconf()
             autotools.configure()
             autotools.make()
 
@@ -86,7 +87,7 @@ class LibUSBConan(MyConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "libusb")
         self.cpp_info.set_property("cmake_target_name", "libusb::libusb")
-        self.cpp_info.set_property("pkg_config_name", "libusb")
+        self.cpp_info.set_property("pkg_config_name", "libusb-1.0")
         self.cpp_info.includedirs = [
             "include",
             "include/libusb-1.0",

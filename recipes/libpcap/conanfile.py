@@ -5,7 +5,7 @@ from conan.tools.microsoft import is_msvc
 from conan.tools.scm import Version
 from conan.tools.files import collect_libs, copy, rmdir, chdir, rm
 from conans import MSBuild
-from conan.tools.gnu import Autotools, AutotoolsToolchain
+from conan.tools.gnu import Autotools, AutotoolsToolchain, AutotoolsDeps
 from conan.errors import ConanInvalidConfiguration
 
 
@@ -62,6 +62,8 @@ class LibPcapConan(MyConanFile):
             "--disable-rdma",
         ])
         tc.generate()
+        deps = AutotoolsDeps(self)
+        deps.generate()
 
     def build(self):
         autotools = Autotools(self)

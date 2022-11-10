@@ -98,7 +98,7 @@ USER jaysinco
 # install
 # -----------------
 RUN sudo apt-get update -y \
-    && sudo apt-get install -y xclip jq ripgrep \
+    && sudo apt-get install -y xclip jq ripgrep flex bison \
     && sudo apt-get install -y libnspr4 libnss3 libsecret-1-0 xdg-utils \
     && sudo npm install -g typescript-language-server typescript pyright \
     && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
