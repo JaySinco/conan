@@ -145,6 +145,9 @@ if [ $do_build_all -eq 1 ]; then
     && package 1 mongoose \
     && package 0 concurrentqueue \
     && package 0 threadpool \
+    && package 1 libusb \
+    && package_linux 0 libpcap \
+    && package_win 0 npcap \
     && echo done!
     exit 0
 fi
