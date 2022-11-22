@@ -45,8 +45,13 @@ class QtConan(MyConanFile):
     def package(self):
         self._configure("qtbase")
         self._build_and_install("qtbase")
-        self._run_qmake("qttools")
-        self._build_and_install("qttools")
+
+        with tools.environment_append({"LLVM_INSTALL_DIR": self._llvm_dir}):
+            self._run_qmake("qttools")
+            self._build_and_install("qttools")
+
+        self._build_doc_and_install("qtbase")
+        self._build_doc_and_install("qttools")
 
         tools.remove_files_by_mask(os.path.join(
             self.package_folder, "lib"), "*.pdb*")
@@ -73,6 +78,16 @@ class QtConan(MyConanFile):
                     cwd=os.path.join(self.source_folder, name))
 
             install_cmd = "{} install".format(self._make_exe)
+            self.run(command=install_cmd,
+                    cwd=os.path.join(self.source_folder, name))
+
+    def _build_doc_and_install(self, name):
+        with tools.vcvars(self) if is_msvc(self) else tools.no_op():
+            build_cmd = "{} docs".format(self._make_exe)
+            self.run(command=build_cmd,
+                    cwd=os.path.join(self.source_folder, name))
+
+            install_cmd = "{} install_qch_docs".format(self._make_exe)
             self.run(command=install_cmd,
                     cwd=os.path.join(self.source_folder, name))
 
@@ -110,6 +125,10 @@ class QtConan(MyConanFile):
             }.get(str(self.settings.compiler))
 
         return None
+
+    @property
+    def _llvm_dir(self):
+        return "C:/Program Files/LLVM" if tools.os_info.is_windows else "/usr/bin/"
 
     @property
     def _configure_exe(self):
