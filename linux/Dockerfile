@@ -13,6 +13,8 @@ FROM ubuntu:20.04
 # chmod 600 .ssh/id_rsa
 # chmod 644 .ssh/id_rsa.pub
 # ssh-add
+# apt-get install -y openssh-server
+# systemctl status ssh
 
 # font
 # -----------------
