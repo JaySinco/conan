@@ -108,16 +108,11 @@ RUN sudo apt-get update -y \
 
 # copy files
 # -----------------
-COPY src/nvim-0.7.0-linux-x86_64.tar.gz \
-     src/lua-language-server-3.2.5-linux-x64.tar.gz \
-     src/code_1.71.2-1663191218_amd64.deb \
+COPY src/code_1.71.2-1663191218_amd64.deb \
      src/font-fira-mono.zip \
      /tmp/
 
 RUN cd /tmp \
-    && sudo tar zxf nvim-0.7.0-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
-    && mkdir -p /home/jaysinco/apps/lua-language-server \
-    && sudo tar zxf lua-language-server-3.2.5-linux-x64.tar.gz --directory=/home/jaysinco/apps/lua-language-server \
     && sudo dpkg -i code_1.71.2-1663191218_amd64.deb \
     && mkdir -p /home/jaysinco/.local/share \
     && sudo unzip font-fira-mono.zip -d /home/jaysinco/.local/share/fonts \
@@ -127,7 +122,7 @@ RUN cd /tmp \
 # -----------------
 ENV XDG_RUNTIME_DIR=/home/jaysinco/xdg-runtime-root \
     NO_AT_BRIDGE=1 \
-    PATH="/home/jaysinco/apps/lua-language-server/bin:/home/jaysinco/.local/bin:${PATH}" \
+    PATH="/home/jaysinco/.local/bin:${PATH}" \
     LD_LIBRARY_PATH="/home/jaysinco/.conan/data/torch/1.8.2/jaysinco/stable/package/4db1be536558d833e52e862fd84d64d75c2b3656/lib"
 
 COPY git-prompt.sh /etc/profile.d

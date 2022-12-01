@@ -64,16 +64,12 @@ docker_image_tag=build:v1
 
 if [ $os = "linux" ]; then
     source_repo=$linux_res_dir/src
-    nvim_config_dir=$HOME/.config/nvim
-    nvim_data_dir=$HOME/.local/share/nvim
     vscode_config_dir=$HOME/.config/Code
-    vscode_config_branch=linux
 elif [ $os = "windows" ]; then
     source_repo=$USERPROFILE/OneDrive/src
     nvim_config_dir=$LOCALAPPDATA/nvim
-    nvim_data_dir=$LOCALAPPDATA/nvim-data
     vscode_config_dir=$APPDATA/Code
-    vscode_config_branch=master
+    wt_config_dir=$LOCALAPPDATA/Microsoft/Windows\ Terminal
 fi
 
 function package() {
@@ -185,8 +181,6 @@ fi
 if [ $do_run_docker -eq 1 ]; then
     mkdir -p \
         $HOME/.ssh \
-        $nvim_config_dir \
-        $nvim_data_dir \
         $vscode_config_dir \
         $HOME/.vscode \
         $HOME/.conan
@@ -198,8 +192,6 @@ if [ $do_run_docker -eq 1 ]; then
         -e LOCAL_GID=$(id -g) \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $HOME/.ssh:/home/jaysinco/.ssh:ro \
-        -v $nvim_config_dir:/home/jaysinco/.config/nvim:rw \
-        -v $nvim_data_dir:/home/jaysinco/.local/share/nvim:rw \
         -v $vscode_config_dir:/home/jaysinco/.config/Code:rw \
         -v $HOME/.vscode:/home/jaysinco/.vscode:rw \
         -v $HOME/.conan:/home/jaysinco/.conan:rw \
@@ -239,20 +231,11 @@ function clone_repo() {
 if [ $do_env_setup -eq 1 ]; then
     if [ $os = "windows" ]; then
         $windows_res_dir/set-env.sh \
-        && clone_repo $LOCALAPPDATA/Microsoft/Windows\ Terminal git@github.com:JaySinco/windows-terminal.git master
-    else
-        if [ ! -f "$HOME/.local/share/fonts/Fira Mono Regular Nerd Font Complete.otf" ]; then
-            mkdir -p $HOME/.local/share/fonts \
-            && unzip $source_repo/font-fira-mono.zip -d $HOME/.local/share/fonts
-        fi
+        && clone_repo "$wt_config_dir" git@github.com:JaySinco/windows-terminal.git master \
+        && clone_repo $vscode_config_dir/User git@github.com:JaySinco/vscode.git master \
+        && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master
     fi \
     && clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
-    && clone_repo $vscode_config_dir/User git@github.com:JaySinco/vscode.git $vscode_config_branch \
-    && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master && \
-    if [ ! -d $nvim_data_dir/site ]; then
-        mkdir -p $nvim_data_dir \
-        && unzip -q $source_repo/nvim-data-site-v2022.09.24-$os.zip -d $nvim_data_dir
-    fi
     exit 0
 fi
 
@@ -269,12 +252,12 @@ function update_repo() {
 
 if [ $do_update_repo -eq 1 ]; then
     if [ $os = "windows" ]; then
-        update_repo $LOCALAPPDATA/Microsoft/Windows\ Terminal
+        update_repo "$wt_config_dir" \
+        && update_repo $vscode_config_dir/User \
+        && update_repo $nvim_config_dir
     fi \
     && update_repo $git_root/../dev-setup \
     && update_repo $git_root/../Prototyping \
-    && update_repo $vscode_config_dir/User \
-    && update_repo $nvim_config_dir
     exit 0
 fi
 
@@ -290,12 +273,12 @@ function status_repo() {
 }
 
 if [ $do_status_repo -eq 1 ]; then
-    status_repo $git_root/../dev-setup \
-    && status_repo $git_root/../Prototyping \
-    && status_repo $vscode_config_dir/User \
-    && status_repo $nvim_config_dir && \
     if [ $os = "windows" ]; then \
-        status_repo $LOCALAPPDATA/Microsoft/Windows\ Terminal
-    fi
+        status_repo "$wt_config_dir" \
+        && status_repo $vscode_config_dir/User \
+        && status_repo $nvim_config_dir
+    fi \
+    && status_repo $git_root/../dev-setup \
+    && status_repo $git_root/../Prototyping \
     exit 0
 fi
