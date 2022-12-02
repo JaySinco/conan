@@ -40,8 +40,17 @@ if [ ! -d $nvim_data_dir/site ]; then
     unzip -q $source_repo/nvim-data-site-v$nvim_version-windows-x86_64.zip -d $nvim_data_dir
 fi
 
-if [ ! -d $program_files_dir/lua-language-server ]; then
-    echo "copy lua-language-server"
-    mkdir -p $program_files_dir/lua-language-server
-    unzip -q $source_repo/lua-language-server-3.2.4-win32-x64.zip -d $program_files_dir/lua-language-server
+if [[ ! $(type -P "conan") ]]; then
+    echo "install conan"
+    pip3 install conan -i https://pypi.tuna.tsinghua.edu.cn/simple
+fi
+
+if [[ ! $(type -P "pyright") ]]; then
+    echo "install pyright"
+    npm install -g pyright
+fi
+
+if [[ ! $(type -P "typescript-language-server") ]]; then
+    echo "install typescript-language-server"
+    npm install -g typescript-language-server typescript
 fi
