@@ -38,10 +38,12 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/msys2/msys/$arch
 shopt -q login_shell || . /etc/profile.d/git-prompt.sh
 ```
 
-## 安装软件()
+## 安装软件
 - Visual Studio
 - VSCode
 - LLVM
+- Nodejs
+- Python
 - Windows Terminal
 - MSYS2
 - PortableGit*

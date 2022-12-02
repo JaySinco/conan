@@ -37,7 +37,7 @@ fi
 if [ ! -d $nvim_data_dir/site ]; then
     echo "copy nvim data"
     mkdir -p $nvim_data_dir
-    unzip -q $source_repo/nvim-data-site-v$nvim_version-windows.zip -d $nvim_data_dir
+    unzip -q $source_repo/nvim-data-site-v$nvim_version-windows-x86_64.zip -d $nvim_data_dir
 fi
 
 if [ ! -d $program_files_dir/lua-language-server ]; then

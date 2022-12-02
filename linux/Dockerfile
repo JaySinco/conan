@@ -108,11 +108,13 @@ RUN sudo apt-get update -y \
 
 # copy files
 # -----------------
-COPY src/code_1.71.2-1663191218_amd64.deb \
+COPY src/nvim-v0.7.2-linux-x86_64.tar.gz \
+     src/code_1.71.2-1663191218_amd64.deb \
      src/font-fira-mono.zip \
      /tmp/
 
 RUN cd /tmp \
+    && sudo tar zxf nvim-v0.7.2-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
     && sudo dpkg -i code_1.71.2-1663191218_amd64.deb \
     && mkdir -p /home/jaysinco/.local/share \
     && sudo unzip font-fira-mono.zip -d /home/jaysinco/.local/share/fonts \

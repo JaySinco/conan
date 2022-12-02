@@ -58,14 +58,18 @@ esac
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 git_root="$(git rev-parse --show-toplevel)"
-linux_res_dir=$git_root/../dev-setup/linux
-windows_res_dir=$git_root/../dev-setup/windows
-docker_image_tag=build:v1
 
 if [ $os = "linux" ]; then
-    source_repo=$linux_res_dir/src
+    res_dir=$git_root/../dev-setup/linux
+    docker_image_tag=build:v1
+    docker_home=/home/jaysinco
+    source_repo=$res_dir/src
+    nvim_config_dir=$HOME/.config/nvim
+    nvim_data_dir=$HOME/.local/share/nvim
     vscode_config_dir=$HOME/.config/Code
+
 elif [ $os = "windows" ]; then
+    res_dir=$git_root/../dev-setup/windows
     source_repo=$USERPROFILE/OneDrive/src
     nvim_config_dir=$LOCALAPPDATA/nvim
     vscode_config_dir=$APPDATA/Code
@@ -172,15 +176,17 @@ fi
 
 if [ $do_build_docker -eq 1 ]; then
     docker build \
-        -f $linux_res_dir/Dockerfile \
+        -f $res_dir/Dockerfile \
         -t $docker_image_tag \
-        $linux_res_dir
+        $res_dir
     exit 0
 fi
 
 if [ $do_run_docker -eq 1 ]; then
     mkdir -p \
         $HOME/.ssh \
+        $nvim_config_dir \
+        $nvim_data_dir \
         $vscode_config_dir \
         $HOME/.vscode \
         $HOME/.conan
@@ -191,12 +197,14 @@ if [ $do_run_docker -eq 1 ]; then
         -e LOCAL_UID=$(id -u) \
         -e LOCAL_GID=$(id -g) \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-        -v $HOME/.ssh:/home/jaysinco/.ssh:ro \
-        -v $vscode_config_dir:/home/jaysinco/.config/Code:rw \
-        -v $HOME/.vscode:/home/jaysinco/.vscode:rw \
-        -v $HOME/.conan:/home/jaysinco/.conan:rw \
-        -v $git_root/../dev-setup:/home/jaysinco/dev-setup:rw \
-        -v $git_root/../Prototyping:/home/jaysinco/Prototyping:rw \
+        -v $HOME/.ssh:$docker_home/.ssh:ro \
+        -v $nvim_config_dir:$docker_home/.config/nvim:rw \
+        -v $nvim_data_dir:$docker_home/.local/share/nvim:rw \
+        -v $vscode_config_dir:$docker_home/.config/Code:rw \
+        -v $HOME/.vscode:$docker_home/.vscode:rw \
+        -v $HOME/.conan:$docker_home/.conan:rw \
+        -v $git_root/../dev-setup:$docker_home/dev-setup:rw \
+        -v $git_root/../Prototyping:$docker_home/Prototyping:rw \
         $docker_image_tag
     exit 0
 fi
@@ -230,12 +238,12 @@ function clone_repo() {
 
 if [ $do_env_setup -eq 1 ]; then
     if [ $os = "windows" ]; then
-        $windows_res_dir/set-env.sh \
-        && clone_repo "$wt_config_dir" git@github.com:JaySinco/windows-terminal.git master \
-        && clone_repo $vscode_config_dir/User git@github.com:JaySinco/vscode.git master \
-        && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master
+        clone_repo "$wt_config_dir" git@github.com:JaySinco/windows-terminal.git master
     fi \
+    && clone_repo $vscode_config_dir/User git@github.com:JaySinco/vscode.git master \
+    && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master \
     && clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
+    && $res_dir/set-env.sh \
     exit 0
 fi
 
@@ -252,10 +260,10 @@ function update_repo() {
 
 if [ $do_update_repo -eq 1 ]; then
     if [ $os = "windows" ]; then
-        update_repo "$wt_config_dir" \
-        && update_repo $vscode_config_dir/User \
-        && update_repo $nvim_config_dir
+        update_repo "$wt_config_dir"
     fi \
+    && update_repo $vscode_config_dir/User \
+    && update_repo $nvim_config_dir \
     && update_repo $git_root/../dev-setup \
     && update_repo $git_root/../Prototyping \
     exit 0
@@ -274,10 +282,10 @@ function status_repo() {
 
 if [ $do_status_repo -eq 1 ]; then
     if [ $os = "windows" ]; then \
-        status_repo "$wt_config_dir" \
-        && status_repo $vscode_config_dir/User \
-        && status_repo $nvim_config_dir
+        status_repo "$wt_config_dir"
     fi \
+    && status_repo $vscode_config_dir/User \
+    && status_repo $nvim_config_dir \
     && status_repo $git_root/../dev-setup \
     && status_repo $git_root/../Prototyping \
     exit 0
