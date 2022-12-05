@@ -43,3 +43,4 @@ if [ ! -f "/mingw64/bin/ninja" ]; then pacman --noconfirm -S mingw-w64-x86_64-ni
 if [ ! -f "/mingw64/bin/cmake" ]; then pacman --noconfirm -S mingw-w64-x86_64-cmake; fi
 if [ ! -f "/mingw64/bin/jq" ]; then pacman --noconfirm -S mingw-w64-x86_64-jq; fi
 if [ ! -f "/mingw64/bin/rg" ]; then pacman --noconfirm -S mingw-w64-x86_64-ripgrep; fi
+if [ ! -f "/mingw64/bin/fd" ]; then pacman --noconfirm -S mingw-w64-x86_64-fd; fi
