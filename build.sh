@@ -67,11 +67,11 @@ if [ $os = "linux" ]; then
     nvim_config_dir=$HOME/.config/nvim
     nvim_data_dir=$HOME/.local/share/nvim
     vscode_config_dir=$HOME/.config/Code
-
 elif [ $os = "windows" ]; then
     res_dir=$git_root/../dev-setup/windows
     source_repo=$USERPROFILE/OneDrive/src
     nvim_config_dir=$LOCALAPPDATA/nvim
+    nvim_data_dir=$LOCALAPPDATA/nvim-data
     vscode_config_dir=$APPDATA/Code
     wt_config_dir=$LOCALAPPDATA/Microsoft/Windows\ Terminal
 fi
@@ -236,6 +236,16 @@ function clone_repo() {
     fi
 }
 
+function copy_nvim_data() {
+    if [ ! -d $nvim_data_dir/site ]; then
+        echo "copy nvim data"
+        nvim_version="0.7.2"
+        nvim_data_file=$source_repo/nvim-data-site-v$nvim_version-$os-x86_64.zip
+        mkdir -p $nvim_data_dir
+        unzip -q $nvim_data_file -d $nvim_data_dir
+    fi
+}
+
 if [ $do_env_setup -eq 1 ]; then
     if [ $os = "windows" ]; then
         clone_repo "$wt_config_dir" git@github.com:JaySinco/windows-terminal.git master
@@ -244,6 +254,7 @@ if [ $do_env_setup -eq 1 ]; then
     && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master \
     && clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
     && $res_dir/set-env.sh \
+    && copy_nvim_data \
     exit 0
 fi
 
