@@ -13,6 +13,7 @@ do_install_ext=0
 do_env_setup=0
 do_update_repo=0
 do_status_repo=0
+do_sync_repo=0
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -32,6 +33,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -n   env setup"
             echo "  -p   pull/push all repo"
             echo "  -s   list all repo status"
+            echo "  -y   sync all repo"
             echo "  -h   print command line options"
             echo
             exit 0
@@ -47,6 +49,7 @@ while [[ $# -gt 0 ]]; do
         -n) do_env_setup=1 && shift ;;
         -p) do_update_repo=1 && shift ;;
         -s) do_status_repo=1 && shift ;;
+        -y) do_sync_repo=1 && shift ;;
          *) echo "Unknown option: $1" && exit 1 ;;
     esac
 done
@@ -222,20 +225,6 @@ if [ $do_install_ext -eq 1 ]; then
     exit 0
 fi
 
-function clone_repo() {
-    if [ ! -d "$1/.git" ]; then
-        echo "** CLONE $2 -b $3" \
-        && mkdir -p "$1" \
-        && cd "$1" \
-        && git init \
-        && git remote add origin $2 \
-        && git fetch \
-        && git checkout origin/$3 -b $3 \
-        && git config user.name jaysinco \
-        && git config user.email jaysinco@163.com
-    fi
-}
-
 function copy_nvim_data() {
     if [ ! -d $nvim_data_dir/site ]; then
         echo "copy nvim data"
@@ -246,13 +235,28 @@ function copy_nvim_data() {
     fi
 }
 
+function clone_repo() {
+    if [ ! -d "$1/.git" ]; then
+        echo "** CLONE $2 -b $3" \
+        && mkdir -p "$1" \
+        && cd "$1" \
+        && git init \
+        && git remote add origin git@gitee.com:$2 \
+        && git fetch \
+        && git checkout origin/$3 -b $3 \
+        && git config user.name jaysinco \
+        && git config user.email jaysinco@163.com \
+        && git remote add backup git@github.com:$2
+    fi
+}
+
 if [ $do_env_setup -eq 1 ]; then
     if [ $os = "windows" ]; then
-        clone_repo "$wt_config_dir" git@github.com:JaySinco/windows-terminal.git master
+        clone_repo "$wt_config_dir" jaysinco/windows-terminal.git master
     fi \
-    && clone_repo $vscode_config_dir/User git@github.com:JaySinco/vscode.git master \
-    && clone_repo $nvim_config_dir git@github.com:JaySinco/nvim.git master \
-    && clone_repo $git_root/../Prototyping git@github.com:JaySinco/Prototyping.git master \
+    && clone_repo $vscode_config_dir/User jaysinco/vscode.git master \
+    && clone_repo $nvim_config_dir jaysinco/nvim.git master \
+    && clone_repo $git_root/../Prototyping jaysinco/Prototyping.git master \
     && $res_dir/set-env.sh \
     && copy_nvim_data \
     exit 0
@@ -260,7 +264,7 @@ fi
 
 function update_repo() {
     cd "$1"
-    echo "pull* "`realpath "$1"`
+    echo "pull* " `realpath "$1"`
     git pull
     git merge-base --is-ancestor HEAD @{u}
     if [ $? -ne 0 ]; then
@@ -299,5 +303,22 @@ if [ $do_status_repo -eq 1 ]; then
     && status_repo $nvim_config_dir \
     && status_repo $git_root/../dev-setup \
     && status_repo $git_root/../Prototyping \
+    exit 0
+fi
+
+function sync_repo() {
+    cd "$1"
+    echo "[sync] push*" `realpath "$1"`
+    git push backup
+}
+
+if [ $do_sync_repo -eq 1 ]; then
+    if [ $os = "windows" ]; then \
+        sync_repo "$wt_config_dir"
+    fi \
+    && sync_repo $vscode_config_dir/User \
+    && sync_repo $nvim_config_dir \
+    && sync_repo $git_root/../dev-setup \
+    && sync_repo $git_root/../Prototyping \
     exit 0
 fi

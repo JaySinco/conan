@@ -10,6 +10,16 @@ source_repo=$USERPROFILE/OneDrive/src
 # -----------------
 MSYSTEM=MSYS /usr/bin/bash --login $script_dir/set-msys.sh
 
+# git config
+# -----------------
+git config --global core.autocrlf true
+git config --global core.safecrlf true
+git config --global core.longpaths true
+git config --global core.quotepath false
+git config --global i18n.filesEncoding utf-8
+git config --global pull.rebase false
+git config --global fetch.prune true
+
 # copy file
 # -----------------
 if [ ! -f ~/.ssh/id_rsa ]; then
