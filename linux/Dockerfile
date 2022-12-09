@@ -75,7 +75,7 @@ RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test \
 RUN wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
     && add-apt-repository 'deb https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/focal/ llvm-toolchain-focal-15 main' \
     && apt-get update -y \
-    && apt-get install -y clangd-15 clang-format-15 clang-tidy-15 lldb-15 \
+    && apt-get install -y clangd-15 clang-format-15 clang-tidy-15 lldb-15 libclang-15-dev \
     && ln -fs /usr/bin/clangd-15 /usr/bin/clangd \
     && ln -fs /usr/bin/clang-format-15 /usr/bin/clang-format \
     && ln -fs /usr/bin/clang-tidy-15 /usr/bin/clang-tidy \
@@ -137,6 +137,7 @@ ENV XDG_RUNTIME_DIR=/home/jaysinco/xdg-runtime-root \
 COPY git-prompt.sh /etc/profile.d
 
 RUN mkdir -p $XDG_RUNTIME_DIR \
+    && chmod 700 $XDG_RUNTIME_DIR \
     && git config --global user.name jaysinco \
     && git config --global user.email jaysinco@163.com \
     && echo "shopt -q login_shell || . /etc/profile.d/git-prompt.sh" >> /home/jaysinco/.bashrc
