@@ -9,7 +9,7 @@ source_repo=$git_root/../dev-setup/linux/src
 # git config
 # -----------------
 git config --global core.autocrlf input
-git config --global core.safecrlf true
+git config --global core.safecrlf false
 git config --global core.longpaths true
 git config --global core.quotepath false
 git config --global i18n.filesEncoding utf-8
