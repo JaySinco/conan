@@ -2,6 +2,7 @@
 
 set -e
 
+git_root="$(git rev-parse --show-toplevel)"
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 source_repo=$git_root/../dev-setup/linux/src
 
