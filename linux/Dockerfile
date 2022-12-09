@@ -81,6 +81,7 @@ RUN wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
     && ln -fs /usr/bin/clang-tidy-15 /usr/bin/clang-tidy \
     && ln -fs /usr/bin/lldb-15 /usr/bin/lldb \
     && ln -fs /usr/bin/lldb-vscode-15 /usr/bin/lldb-vscode \
+    && ln -fs /usr/bin/llvm-config-15 /usr/bin/llvm-config \
     && mkdir -p /usr/lib/lib/python3.8/site-packages/lldb \
     && ln -s /usr/lib/llvm-15/lib/python3.8/site-packages/lldb/* /usr/lib/lib/python3.8/site-packages/lldb/
 

@@ -46,7 +46,9 @@ class QtConan(MyConanFile):
         self._configure("qtbase")
         self._build_and_install("qtbase")
 
-        with tools.environment_append({"LLVM_INSTALL_DIR": self._llvm_dir}):
+        with tools.environment_append({
+            "LLVM_INSTALL_DIR": "C:/Program Files/LLVM"
+        }) if tools.os_info.is_windows else tools.no_op():
             self._run_qmake("qttools")
             self._build_and_install("qttools")
 
@@ -125,10 +127,6 @@ class QtConan(MyConanFile):
             }.get(str(self.settings.compiler))
 
         return None
-
-    @property
-    def _llvm_dir(self):
-        return "C:/Program Files/LLVM" if tools.os_info.is_windows else "/usr/bin/"
 
     @property
     def _configure_exe(self):
