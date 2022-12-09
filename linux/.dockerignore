@@ -2,5 +2,6 @@
 !src/nvim-v0.7.2-linux-x86_64.tar.gz
 !src/cmake-3.23.1.tar.gz
 !src/code_1.71.2-1663191218_amd64.deb
-!src/font-fira-mono.zip
+!src/font-hack.zip
 !git-prompt.sh
+!src/res/get-pip.py

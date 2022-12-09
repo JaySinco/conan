@@ -19,7 +19,7 @@ git config --global fetch.prune true
 # copy file
 # -----------------
 if [ ! -f ~/.ssh/id_rsa ]; then
-    echo "copy ~/.ssh key"
+    echo "copy ssh key"
     mkdir -p ~/.ssh
     cp $source_repo/res/id_rsa ~/.ssh
     cp $source_repo/res/id_rsa.pub ~/.ssh
@@ -28,3 +28,8 @@ if [ ! -f ~/.ssh/id_rsa ]; then
     chmod 644 ~/.ssh/id_rsa.pub
 fi
 
+if [ ! -f ~/.local/share/fonts/'Hack Regular Nerd Font Complete.ttf' ]; then
+    echo "copy fonts"
+    mkdir -p ~/.local/share/fonts
+    unzip $source_repo/font-hack.zip -d ~/.local/share/fonts/
+fi

@@ -18,7 +18,7 @@ FROM ubuntu:20.04
 
 # font
 # -----------------
-# FiraMono Nerd Font Medium 11
+# Hack Nerd Font 10
 # mv *.ttf ~/.local/share/fonts
 # fc-cache -fv
 
@@ -75,17 +75,21 @@ RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test \
 RUN wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
     && add-apt-repository 'deb https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/focal/ llvm-toolchain-focal-15 main' \
     && apt-get update -y \
-    && apt-get install -y clangd-15 clang-format-15 clang-tidy-15 \
-    && ln -s /usr/bin/clangd-15 /usr/bin/clangd \
-    && ln -s /usr/bin/clang-format-15 /usr/bin/clang-format \
-    && ln -s /usr/bin/clang-tidy-15 /usr/bin/clang-tidy
+    && apt-get install -y clangd-15 clang-format-15 clang-tidy-15 lldb-15 \
+    && ln -fs /usr/bin/clangd-15 /usr/bin/clangd \
+    && ln -fs /usr/bin/clang-format-15 /usr/bin/clang-format \
+    && ln -fs /usr/bin/clang-tidy-15 /usr/bin/clang-tidy \
+    && ln -fs /usr/bin/lldb-15 /usr/bin/lldb \
+    && ln -fs /usr/bin/lldb-vscode-15 /usr/bin/lldb-vscode \
+    && mkdir -p /usr/lib/lib/python3.8/site-packages/lldb \
+    && ln -s /usr/lib/llvm-15/lib/python3.8/site-packages/lldb/* /usr/lib/lib/python3.8/site-packages/lldb/
 
 # common utils
 # -----------------
-RUN apt-get update -y \
-    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get update -y \
     && apt-get install -y gdb zip git git-lfs git-gui ninja-build \
-        python3 python3-pip nodejs ttf-wqy-microhei
+        nodejs ttf-wqy-microhei 
 
 # switch user
 # -----------------
@@ -97,27 +101,29 @@ RUN apt-get update -y \
 
 USER jaysinco
 
+COPY src/nvim-v0.7.2-linux-x86_64.tar.gz \
+     src/code_1.71.2-1663191218_amd64.deb \
+     src/font-hack.zip \
+     src/res/get-pip.py \
+     /tmp/
+
 # install
 # -----------------
 RUN sudo apt-get update -y \
     && sudo apt-get install -y xclip jq ripgrep flex bison \
     && sudo apt-get install -y libnspr4 libnss3 libsecret-1-0 xdg-utils \
     && sudo npm install -g typescript-language-server typescript pyright \
-    && pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-    && pip3 install --no-warn-script-location conan
+    && python3 /tmp/get-pip.py \
+    && python3 -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    && python3 -m pip install --no-warn-script-location conan
 
 # copy files
 # -----------------
-COPY src/nvim-v0.7.2-linux-x86_64.tar.gz \
-     src/code_1.71.2-1663191218_amd64.deb \
-     src/font-fira-mono.zip \
-     /tmp/
-
 RUN cd /tmp \
     && sudo tar zxf nvim-v0.7.2-linux-x86_64.tar.gz --directory=/usr --strip-components=1 \
     && sudo dpkg -i code_1.71.2-1663191218_amd64.deb \
     && mkdir -p /home/jaysinco/.local/share \
-    && sudo unzip font-fira-mono.zip -d /home/jaysinco/.local/share/fonts \
+    && sudo unzip font-hack.zip -d /home/jaysinco/.local/share/fonts \
     && sudo rm -rf /tmp/*
 
 # config
