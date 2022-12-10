@@ -47,6 +47,11 @@ if [[ ! $(type -P "conan") ]]; then
     pip3 install conan==1.52 -i https://pypi.tuna.tsinghua.edu.cn/simple
 fi
 
+if [[ ! $(type -P "debugpy") ]]; then
+    echo "install debugpy"
+    pip3 install debugpy -i https://pypi.tuna.tsinghua.edu.cn/simple
+fi
+
 if [[ ! $(type -P "pyright") ]]; then
     echo "install pyright"
     npm install -g pyright
