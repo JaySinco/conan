@@ -47,7 +47,7 @@ if [[ ! $(type -P "conan") ]]; then
     pip3 install conan==1.52 -i https://pypi.tuna.tsinghua.edu.cn/simple
 fi
 
-if [[ ! $(type -P "debugpy") ]]; then
+if ! pip3 show -q debugpy; then
     echo "install debugpy"
     pip3 install debugpy -i https://pypi.tuna.tsinghua.edu.cn/simple
 fi
