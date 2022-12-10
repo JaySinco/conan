@@ -44,7 +44,7 @@ fi
 
 if [[ ! $(type -P "conan") ]]; then
     echo "install conan"
-    pip3 install conan -i https://pypi.tuna.tsinghua.edu.cn/simple
+    pip3 install conan==1.52 -i https://pypi.tuna.tsinghua.edu.cn/simple
 fi
 
 if [[ ! $(type -P "pyright") ]]; then

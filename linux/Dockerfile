@@ -90,7 +90,7 @@ RUN wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get update -y \
     && apt-get install -y gdb zip git git-lfs git-gui ninja-build \
-        nodejs ttf-wqy-microhei 
+        nodejs ttf-wqy-microhei
 
 # switch user
 # -----------------
@@ -116,7 +116,7 @@ RUN sudo apt-get update -y \
     && sudo npm install -g typescript-language-server typescript pyright \
     && python3 /tmp/get-pip.py \
     && python3 -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-    && python3 -m pip install --no-warn-script-location conan
+    && python3 -m pip install --no-warn-script-location conan==1.52
 
 # copy files
 # -----------------
