@@ -114,7 +114,7 @@ RUN sudo apt-get update -y \
     && sudo apt-get install -y xclip jq ripgrep flex bison \
     && sudo apt-get install -y libnspr4 libnss3 libsecret-1-0 xdg-utils \
     && sudo npm install -g typescript-language-server typescript pyright \
-    && ln -fs /usr/bin/python3 /usr/bin/python \
+    && sudo ln -fs /usr/bin/python3 /usr/bin/python \
     && python /tmp/get-pip.py \
     && python -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
     && python -m pip install conan==1.52 debugpy
