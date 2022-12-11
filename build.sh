@@ -236,18 +236,18 @@ function copy_nvim_data() {
 }
 
 function clone_repo() {
+    mkdir -p "$1" 
+    cd "$1" 
     if [ ! -d "$1/.git" ]; then
         echo "** CLONE $2 -b $3" \
-        && mkdir -p "$1" \
-        && cd "$1" \
         && git init \
         && git remote add origin git@gitee.com:$2 \
         && git fetch \
         && git checkout origin/$3 -b $3 \
-        && git config user.name jaysinco \
-        && git config user.email jaysinco@163.com \
         && git remote add backup git@github.com:$2
     fi
+    git config user.name jaysinco
+    git config user.email jaysinco@163.com
 }
 
 if [ $do_env_setup -eq 1 ]; then
@@ -256,6 +256,7 @@ if [ $do_env_setup -eq 1 ]; then
     fi \
     && clone_repo $vscode_config_dir/User jaysinco/vscode.git master \
     && clone_repo $nvim_config_dir jaysinco/nvim.git master \
+    && clone_repo $git_root/../dev-setup jaysinco/dev-setup.git master \
     && clone_repo $git_root/../Prototyping jaysinco/Prototyping.git master \
     && $res_dir/set-env.sh \
     && copy_nvim_data \
