@@ -132,8 +132,7 @@ RUN cd /tmp \
 # -----------------
 ENV XDG_RUNTIME_DIR=/home/jaysinco/xdg-runtime-root \
     NO_AT_BRIDGE=1 \
-    PATH="/home/jaysinco/.local/bin:${PATH}" \
-    LD_LIBRARY_PATH="/home/jaysinco/.conan/data/torch/1.8.2/jaysinco/stable/package/4db1be536558d833e52e862fd84d64d75c2b3656/lib"
+    PATH="/home/jaysinco/.local/bin:${PATH}"
 
 COPY git-prompt.sh /etc/profile.d
 
