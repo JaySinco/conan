@@ -8,6 +8,8 @@ do_unmount=0
 do_vmware=0
 do_build_docker=0
 do_run_docker=0
+do_save_docker=0
+do_load_docker=0
 do_list_ext=0
 do_install_ext=0
 do_env_setup=0
@@ -22,35 +24,39 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: build.sh [options]"
             echo
             echo "Options:"
-            echo "  -a   build all targets"
-            echo "  -m   mount share [default: vbox]"
-            echo "  -u   unmount share [default: vbox]"
-            echo "  -v   u/mount vmware"
-            echo "  -k   build docker"
-            echo "  -r   run docker"
-            echo "  -l   list vscode extensions"
-            echo "  -i   install vscode extensions"
-            echo "  -n   env setup"
-            echo "  -p   pull/push all repo"
-            echo "  -s   list all repo status"
-            echo "  -y   sync all repo"
-            echo "  -h   print command line options"
+            echo "  -a    build all targets"
+            echo "  -m    mount share [default: vbox]"
+            echo "  -u    unmount share [default: vbox]"
+            echo "  -vm   u/mount vmware"
+            echo "  -k    build docker"
+            echo "  -r    run docker"
+            echo "  -ds   save docker"
+            echo "  -dl   load docker"
+            echo "  -vl   list vscode extensions"
+            echo "  -vi   install vscode extensions"
+            echo "  -n    env setup"
+            echo "  -p    pull/push all repo"
+            echo "  -s    list all repo status"
+            echo "  -y    sync all repo"
+            echo "  -h    print command line options"
             echo
             exit 0
             ;;
-        -a) do_build_all=1 && shift ;;
-        -m) do_mount=1 && shift ;;
-        -u) do_unmount=1 && shift ;;
-        -v) do_vmware=1 && shift ;;
-        -k) do_build_docker=1 && shift ;;
-        -r) do_run_docker=1 && shift ;;
-        -l) do_list_ext=1 && shift ;;
-        -i) do_install_ext=1 && shift ;;
-        -n) do_env_setup=1 && shift ;;
-        -p) do_update_repo=1 && shift ;;
-        -s) do_status_repo=1 && shift ;;
-        -y) do_sync_repo=1 && shift ;;
-         *) echo "Unknown option: $1" && exit 1 ;;
+         -a) do_build_all=1 && shift ;;
+         -m) do_mount=1 && shift ;;
+         -u) do_unmount=1 && shift ;;
+        -vm) do_vmware=1 && shift ;;
+         -k) do_build_docker=1 && shift ;;
+         -r) do_run_docker=1 && shift ;;
+        -ds) do_save_docker=1 && shift ;;
+        -dl) do_load_docker=1 && shift ;;
+        -vl) do_list_ext=1 && shift ;;
+        -vi) do_install_ext=1 && shift ;;
+         -n) do_env_setup=1 && shift ;;
+         -p) do_update_repo=1 && shift ;;
+         -s) do_status_repo=1 && shift ;;
+         -y) do_sync_repo=1 && shift ;;
+          *) echo "Unknown option: $1" && exit 1 ;;
     esac
 done
 
@@ -64,7 +70,8 @@ git_root="$(git rev-parse --show-toplevel)"
 
 if [ $os = "linux" ]; then
     res_dir=$git_root/../dev-setup/linux
-    docker_image_tag=build:v1
+    docker_image_tag=jaysinco-dev:v1
+    docker_image_file=docker-dev-image-$os-x86_64
     docker_home=/home/jaysinco
     source_repo=$res_dir/src
     nvim_config_dir=$HOME/.config/nvim
@@ -158,11 +165,11 @@ fi
 if [ $do_mount -eq 1 ]; then
     mkdir -p $source_repo
     if [ $do_vmware -eq 0 ]; then
-        sudo mount -t vboxsf -o ro,uid=$(id -u),gid=$(id -g) \
+        sudo mount -t vboxsf -o rw,uid=$(id -u),gid=$(id -g) \
             share $source_repo
     else
         # apt install open-vm-tools open-vm-tools-desktop
-        vmhgfs-fuse -o ro,uid=$(id -u),gid=$(id -g) \
+        vmhgfs-fuse -o rw,uid=$(id -u),gid=$(id -g) \
             .host:/share $source_repo
     fi
     exit 0
@@ -209,6 +216,17 @@ if [ $do_run_docker -eq 1 ]; then
         -v $git_root/../dev-setup:$docker_home/dev-setup:rw \
         -v $git_root/../Prototyping:$docker_home/Prototyping:rw \
         $docker_image_tag
+    exit 0
+fi
+
+if [ $do_save_docker -eq 1 ]; then
+    docker save $docker_image_tag | \
+        gzip > $source_repo/$docker_image_file.tar.gz
+    exit 0
+fi
+
+if [ $do_load_docker -eq 1 ]; then
+    docker load < $source_repo/$docker_image_file.tar.gz
     exit 0
 fi
 

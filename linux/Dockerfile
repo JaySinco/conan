@@ -88,6 +88,7 @@ RUN wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
 # common utils
 # -----------------
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && add-apt-repository ppa:git-core/ppa -y \
     && apt-get update -y \
     && apt-get install -y gdb zip git git-lfs git-gui ninja-build \
         nodejs ttf-wqy-microhei
